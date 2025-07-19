@@ -1,24 +1,17 @@
-package com.c    companion object {
-        private const val TAG = "ModelManager"
-        private const val MODEL_FILENAME = "gemma-3n-E4B-it-int4.task"
-        private const val MODEL_DEVICE_PATH = "/data/local/tmp/llm/gemma-3n-E4B-it-int4.task"
-    }tand.model
+package com.checkstand.model
 
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.net.URL
 
 class ModelManager(private val context: Context) {
     
     companion object {
         private const val TAG = "ModelManager"
-        private const val MODEL_FILENAME = "gemma-2b-it-gpu-int4.bin"
-        private const val MODEL_URL = "https://storage.googleapis.com/download.tensorflow.org/models/gemma/gemma-2b-it-gpu-int4.bin"
+        private const val MODEL_FILENAME = "gemma-3n-E4B-it-int4.task"
+        private const val MODEL_DEVICE_PATH = "/data/local/tmp/llm/gemma-3n-E4B-it-int4.task"
     }
     
     fun getModelFile(): File {

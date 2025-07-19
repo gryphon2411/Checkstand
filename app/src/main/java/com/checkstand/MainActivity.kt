@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.checkstand.ui.screens.ChatScreen
+import com.checkstand.ui.screens.DebugScreen
 import com.checkstand.ui.screens.SetupScreen
 import com.checkstand.ui.theme.CheckstandTheme
 
@@ -33,12 +34,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CheckstandApp() {
     var showSetup by remember { mutableStateOf(true) }
+    var showDebug by remember { mutableStateOf(false) }
     
-    if (showSetup) {
-        SetupScreen(
-            onContinueClick = { showSetup = false }
-        )
-    } else {
-        ChatScreen()
+    when {
+        showSetup -> {
+            SetupScreen(
+                onContinueClick = { showSetup = false }
+            )
+        }
+        showDebug -> {
+            DebugScreen(
+                onBackToChat = { showDebug = false }
+            )
+        }
+        else -> {
+            ChatScreen(
+                onDebugClick = { showDebug = true }
+            )
+        }
     }
 }
