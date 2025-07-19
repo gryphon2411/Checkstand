@@ -10,8 +10,8 @@ class ModelManager(private val context: Context) {
     
     companion object {
         private const val TAG = "ModelManager"
-        private const val MODEL_FILENAME = "gemma-3n-E4B-it-int4.task"
-        private const val MODEL_DEVICE_PATH = "/data/local/tmp/llm/gemma-3n-E4B-it-int4.task"
+        private const val MODEL_FILENAME = "gemma-3n-E2B-it-int4.task"
+        private const val MODEL_DEVICE_PATH = "/data/local/tmp/llm/gemma-3n-E2B-it-int4.task"
     }
     
     fun getModelFile(): File {

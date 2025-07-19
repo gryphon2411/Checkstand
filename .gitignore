@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Large model files
+*.task
