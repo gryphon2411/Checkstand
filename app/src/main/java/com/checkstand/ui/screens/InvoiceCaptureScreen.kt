@@ -37,6 +37,8 @@ import com.checkstand.service.CameraService
 import com.checkstand.service.ModelStatus
 import com.checkstand.ui.viewmodel.ReceiptViewModel
 import com.checkstand.utils.ImageUtils
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -332,6 +334,50 @@ fun InvoiceCaptureScreen(
             }
         }
         
+        // Success message for processed receipt
+        uiState.lastProcessedReceipt?.let { receipt ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Receipt processed successfully!",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            "${receipt.merchantName} • $${receipt.totalAmount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    IconButton(onClick = { viewModel.clearLastProcessedReceipt() }) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Dismiss",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
+        }
+
         // Error message
         uiState.errorMessage?.let { error ->
             Card(
@@ -400,8 +446,7 @@ fun InvoiceCaptureScreen(
                 items(receipts) { receipt ->
                     ReceiptCard(
                         receipt = receipt,
-                        onDelete = { viewModel.deleteReceipt(receipt.id) },
-                        onCategorize = { viewModel.categorizeExpense(receipt) }
+                        onDelete = { viewModel.deleteReceipt(receipt.id) }
                     )
                 }
                 
@@ -418,15 +463,43 @@ fun InvoiceCaptureScreen(
 fun ReceiptCard(
     receipt: Receipt,
     onDelete: () -> Unit,
-    onCategorize: () -> Unit
+    isNew: Boolean = false
 ) {
+    val isRecentlyProcessed = System.currentTimeMillis() - receipt.createdAt < 10000 // 10 seconds
+    
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isRecentlyProcessed) 8.dp else 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isRecentlyProcessed) 
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            else 
+                MaterialTheme.colorScheme.surface
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // "NEW" badge for recently processed receipts
+            if (isRecentlyProcessed) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    AssistChip(
+                        onClick = { },
+                        label = { Text("NEW", fontWeight = FontWeight.Bold) },
+                        leadingIcon = { Text("✨") },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            labelColor = MaterialTheme.colorScheme.onPrimary,
+                            leadingIconContentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -439,7 +512,7 @@ fun ReceiptCard(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        receipt.date.toString(),
+                        formatDate(receipt.date),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -453,28 +526,7 @@ fun ReceiptCard(
                 )
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // Category chip
-            if (receipt.category != null) {
-                AssistChip(
-                    onClick = onCategorize,
-                    label = { Text(receipt.category.name) },
-                    leadingIcon = {
-                        Text("🏷️")
-                    }
-                )
-            } else {
-                AssistChip(
-                    onClick = onCategorize,
-                    label = { Text("Categorize") },
-                    leadingIcon = {
-                        Text("✨")
-                    }
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             
             // Action buttons
             Row(
@@ -493,4 +545,10 @@ fun ReceiptCard(
             }
         }
     }
+}
+
+// Helper function to format date without time
+private fun formatDate(date: Date): String {
+    val formatter = java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
+    return formatter.format(date)
 }
