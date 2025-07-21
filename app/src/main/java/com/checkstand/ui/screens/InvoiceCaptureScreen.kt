@@ -99,7 +99,7 @@ fun InvoiceCaptureScreen(
             )
         )
         
-        // Compact Model Status Chip
+        // Enhanced Model Status Chip with processing state
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -110,41 +110,49 @@ fun InvoiceCaptureScreen(
                 onClick = { },
                 label = { 
                     Text(
-                        when (modelStatus) {
-                            ModelStatus.READY -> "Ready"
-                            ModelStatus.LOADING -> "Loading..."
-                            ModelStatus.ERROR -> "Error"
-                            ModelStatus.NOT_LOADED -> "Loading..."
+                        when {
+                            uiState.isProcessing -> "Gemma 3n"
+                            modelStatus == ModelStatus.READY -> "Gemma 3n"
+                            modelStatus == ModelStatus.LOADING -> "Loading Gemma 3n"
+                            modelStatus == ModelStatus.ERROR -> "Model Error"
+                            modelStatus == ModelStatus.NOT_LOADED -> "Loading"
+                            else -> "Unknown"
                         }
                     )
                 },
                 leadingIcon = {
-                    when (modelStatus) {
-                        ModelStatus.READY -> Icon(
+                    when {
+                        uiState.isProcessing -> CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp)
+                        )
+                        modelStatus == ModelStatus.READY -> Icon(
                             Icons.Default.CheckCircle,
                             contentDescription = "Ready",
                             modifier = Modifier.size(16.dp)
                         )
-                        ModelStatus.LOADING -> CircularProgressIndicator(
+                        modelStatus == ModelStatus.LOADING -> CircularProgressIndicator(
                             progress = { loadingProgress },
                             modifier = Modifier.size(16.dp)
                         )
-                        ModelStatus.ERROR -> Icon(
+                        modelStatus == ModelStatus.ERROR -> Icon(
                             Icons.Default.Warning,
                             contentDescription = "Error",
                             modifier = Modifier.size(16.dp)
                         )
-                        ModelStatus.NOT_LOADED -> CircularProgressIndicator(
+                        modelStatus == ModelStatus.NOT_LOADED -> CircularProgressIndicator(
                             modifier = Modifier.size(16.dp)
                         )
+                        else -> null
                     }
                 },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = when (modelStatus) {
-                        ModelStatus.READY -> MaterialTheme.colorScheme.primaryContainer
-                        ModelStatus.LOADING -> MaterialTheme.colorScheme.secondaryContainer
-                        ModelStatus.ERROR -> MaterialTheme.colorScheme.errorContainer
-                        ModelStatus.NOT_LOADED -> MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = when {
+                        uiState.isProcessing -> MaterialTheme.colorScheme.secondaryContainer
+                        modelStatus == ModelStatus.READY -> MaterialTheme.colorScheme.primaryContainer
+                        modelStatus == ModelStatus.LOADING -> MaterialTheme.colorScheme.secondaryContainer
+                        modelStatus == ModelStatus.ERROR -> MaterialTheme.colorScheme.errorContainer
+                        modelStatus == ModelStatus.NOT_LOADED -> MaterialTheme.colorScheme.surfaceVariant
+                        else -> MaterialTheme.colorScheme.surfaceVariant
                     }
                 )
             )
@@ -186,21 +194,21 @@ fun InvoiceCaptureScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Gallery button
+                // Gallery button with universally supported emoji
                 FloatingActionButton(
                     onClick = { 
-                        if (modelStatus == ModelStatus.READY) {
+                        if (modelStatus == ModelStatus.READY && !uiState.isProcessing) {
                             galleryLauncher.launch("image/*")
                         }
                     },
                     modifier = Modifier.size(56.dp),
-                    containerColor = if (modelStatus == ModelStatus.READY) 
+                    containerColor = if (modelStatus == ModelStatus.READY && !uiState.isProcessing) 
                         MaterialTheme.colorScheme.primary 
                     else 
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 ) {
                     Text(
-                        "�️", 
+                        "📁", 
                         fontSize = MaterialTheme.typography.headlineSmall.fontSize
                     )
                 }
@@ -208,7 +216,7 @@ fun InvoiceCaptureScreen(
                 // Capture button
                 FloatingActionButton(
                     onClick = {
-                        if (modelStatus == ModelStatus.READY) {
+                        if (modelStatus == ModelStatus.READY && !uiState.isProcessing) {
                             cameraService.capturePhoto(
                                 onImageCaptured = { uri -> 
                                     val bitmap = ImageUtils.uriToBitmap(context, uri, rotateForPortrait = true)
@@ -221,7 +229,7 @@ fun InvoiceCaptureScreen(
                         }
                     },
                     modifier = Modifier.size(72.dp),
-                    containerColor = if (modelStatus == ModelStatus.READY) 
+                    containerColor = if (modelStatus == ModelStatus.READY && !uiState.isProcessing) 
                         MaterialTheme.colorScheme.primary 
                     else 
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
@@ -244,39 +252,6 @@ fun InvoiceCaptureScreen(
                         contentDescription = "View receipts",
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
-                }
-            }
-        }
-        
-        // Processing indicator
-        if (uiState.isProcessing) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            "Processing receipt...",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
                 }
             }
         }
