@@ -92,7 +92,7 @@ fun InvoiceCaptureScreen(
     ) {
         // Top App Bar
         TopAppBar(
-            title = { Text("Receipt Scanner") },
+            title = { Text("Checkstand") },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 titleContentColor = MaterialTheme.colorScheme.onPrimary
@@ -163,7 +163,7 @@ fun InvoiceCaptureScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .height(450.dp)
                     .padding(16.dp)
                     .clip(RoundedCornerShape(12.dp))
             ) {
