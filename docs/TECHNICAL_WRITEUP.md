@@ -12,6 +12,46 @@ Checkstand represents a paradigm shift in receipt processing applications by imp
 
 ---
 
+## Development Journey: From Cross-Platform to Native Excellence
+
+### Architecture Evolution - A Real-World AI Deployment Story
+
+Checkstand's development journey exemplifies the practical challenges of deploying large AI models in mobile applications. Our path from React Native to pure Android native reveals critical insights about on-device AI constraints.
+
+**Initial Approach: React Native/Expo (July 18, 2025)**
+We began with React Native for cross-platform efficiency. The initial implementation included:
+- Complete UI framework with navigation
+- MediaPipe integration planning
+- Standard Expo/Metro bundler setup
+
+**The Constraint: Metro Bundler Limitation**
+When integrating the 4.4GB Gemma 3n model, we encountered Metro bundler's hard 2GB file size limit. This wasn't a theoretical problem - it was a deployment blocker.
+
+**Creative Solution: Custom Native Module**
+Rather than compromising, we developed a sophisticated workaround:
+```java
+// NativeModelLoaderModule.java
+public class NativeModelLoaderModule extends ReactContextBaseJavaModule {
+    @ReactMethod
+    public void loadModel(Promise promise) {
+        // Bypass bundler by copying 4.4GB model at runtime
+        copyAssetToStorage("gemma_3n.task");
+        promise.resolve(getModelPath());
+    }
+}
+```
+
+**Strategic Pivot: Pure Native Android**
+While the native module worked, we made the strategic decision to pivot to pure Android native. Why?
+- **Performance**: Direct MediaPipe integration without React Native bridge overhead
+- **Reliability**: Simpler architecture reduces potential failure points  
+- **Optimization**: Native code allows fine-tuned memory management for large models
+- **Maintenance**: Single codebase focused on Android's AI capabilities
+
+This decision demonstrates engineering maturity - choosing the right tool for the job over development convenience.
+
+---
+
 ## Technical Architecture
 
 ### System Overview

@@ -34,6 +34,9 @@ How can a **private, offline-first, multimodal model** make a tangible differenc
 - **Camera Integration**: CameraX with real-time preview and capture
 - **Modern Android**: Jetpack Compose UI with Material 3 design
 
+### **Why Native Android?**
+*Development Journey Note*: We initially explored React Native for cross-platform efficiency, but encountered Metro bundler's 2GB file size limitation with our 4.4GB Gemma 3n model. While we successfully created a custom native module workaround, we ultimately chose pure Android native for optimal performance and simplified architecture. This decision exemplifies choosing the right tool for AI deployment constraints.
+
 ## 🎬 **See It In Action**
 
 [🎥 **Demo Video**](#) *(Coming Soon)*

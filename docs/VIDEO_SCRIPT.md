@@ -30,11 +30,16 @@
 
 **NARRATOR**: "The challenge asked us to think bigger than a simple chatbot. Checkstand answers that call by turning your phone into a privacy-preserving financial assistant that never sends your data anywhere."
 
+### **Development Journey Insight** *(1:15 - 1:30)*
+**[Show quick montage: React Native logo → Error screen → Android logo]**
+
+**NARRATOR**: "We actually started building this in React Native, but hit a real constraint - the Metro bundler couldn't handle our 4.4GB AI model. Rather than compromise, we pivoted to native Android, proving our commitment to the best possible solution."
+
 ---
 
-## **SCENE 3: Live Demonstration** *(1:15 - 2:30)*
+## **SCENE 3: Live Demonstration** *(1:30 - 2:45)*
 
-### **Demo Setup** *(1:15 - 1:25)*
+### **Demo Setup** *(1:30 - 1:40)*
 **[Show real receipts and phone ready]**
 
 **NARRATOR**: "Let me show you how it works. I have real receipts here, and I'm going to scan them live - no editing, no tricks."
