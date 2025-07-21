@@ -13,7 +13,9 @@ import com.checkstand.ui.screens.ChatScreen
 import com.checkstand.ui.screens.DebugScreen
 import com.checkstand.ui.screens.SetupScreen
 import com.checkstand.ui.theme.CheckstandTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

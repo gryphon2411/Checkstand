@@ -13,15 +13,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.checkstand.ui.viewmodel.ChatMessage
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.checkstand.domain.model.ChatMessage
 import com.checkstand.ui.viewmodel.ChatViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
-    viewModel: ChatViewModel = viewModel(),
+    viewModel: ChatViewModel = hiltViewModel(),
     onDebugClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -120,7 +120,7 @@ fun ChatScreen(
             value = uiState.currentInput,
             onValueChange = viewModel::updateInput,
             onSendClick = { viewModel.sendMessage(uiState.currentInput) },
-            enabled = uiState.isModelLoaded && !uiState.isLoading
+            enabled = uiState.isModelLoaded && !uiState.isGenerating
         )
     }
 }
