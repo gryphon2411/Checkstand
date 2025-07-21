@@ -99,100 +99,59 @@ fun InvoiceCaptureScreen(
             )
         )
         
-        // Model Status Section
-        Card(
+        // Compact Model Status Chip
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = when (modelStatus) {
-                    ModelStatus.READY -> MaterialTheme.colorScheme.primaryContainer
-                    ModelStatus.LOADING -> MaterialTheme.colorScheme.secondaryContainer
-                    ModelStatus.ERROR -> MaterialTheme.colorScheme.errorContainer
-                    ModelStatus.NOT_LOADED -> MaterialTheme.colorScheme.surfaceVariant
-                }
-            )
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+            AssistChip(
+                onClick = { },
+                label = { 
+                    Text(
+                        when (modelStatus) {
+                            ModelStatus.READY -> "Ready"
+                            ModelStatus.LOADING -> "Loading..."
+                            ModelStatus.ERROR -> "Error"
+                            ModelStatus.NOT_LOADED -> "Loading..."
+                        }
+                    )
+                },
+                leadingIcon = {
                     when (modelStatus) {
-                        ModelStatus.READY -> {
-                            Icon(
-                                Icons.Default.CheckCircle,
-                                contentDescription = "Ready",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        ModelStatus.LOADING -> {
-                            CircularProgressIndicator(
-                                progress = { loadingProgress },
-                                modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                        ModelStatus.ERROR -> {
-                            Icon(
-                                Icons.Default.Warning,
-                                contentDescription = "Error",
-                                tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        ModelStatus.NOT_LOADED -> {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = "Not loaded",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                        ModelStatus.READY -> Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = "Ready",
+                            modifier = Modifier.size(16.dp)
+                        )
+                        ModelStatus.LOADING -> CircularProgressIndicator(
+                            progress = { loadingProgress },
+                            modifier = Modifier.size(16.dp)
+                        )
+                        ModelStatus.ERROR -> Icon(
+                            Icons.Default.Warning,
+                            contentDescription = "Error",
+                            modifier = Modifier.size(16.dp)
+                        )
+                        ModelStatus.NOT_LOADED -> CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
-                    
-                    Text(
-                        text = statusMessage,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = if (modelStatus == ModelStatus.READY) FontWeight.Bold else FontWeight.Normal,
-                        color = when (modelStatus) {
-                            ModelStatus.READY -> MaterialTheme.colorScheme.onPrimaryContainer
-                            ModelStatus.LOADING -> MaterialTheme.colorScheme.onSecondaryContainer
-                            ModelStatus.ERROR -> MaterialTheme.colorScheme.onErrorContainer
-                            ModelStatus.NOT_LOADED -> MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-                    )
-                }
-                
-                if (modelStatus == ModelStatus.LOADING) {
-                    LinearProgressIndicator(
-                        progress = { loadingProgress },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-                
-                if (modelStatus != ModelStatus.READY) {
-                    Text(
-                        text = when (modelStatus) {
-                            ModelStatus.LOADING -> "Please wait while the AI model loads..."
-                            ModelStatus.ERROR -> "Cannot process receipts until model loads successfully"
-                            ModelStatus.NOT_LOADED -> "Capture buttons will be enabled when model is ready"
-                            else -> ""
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+                },
+                colors = AssistChipDefaults.assistChipColors(
+                    containerColor = when (modelStatus) {
+                        ModelStatus.READY -> MaterialTheme.colorScheme.primaryContainer
+                        ModelStatus.LOADING -> MaterialTheme.colorScheme.secondaryContainer
+                        ModelStatus.ERROR -> MaterialTheme.colorScheme.errorContainer
+                        ModelStatus.NOT_LOADED -> MaterialTheme.colorScheme.surfaceVariant
+                    }
+                )
+            )
         }
         
         if (showCamera && hasCameraPermission) {
-            // Camera Preview Section
+            // Camera Preview Section (without button overlay)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -217,86 +176,74 @@ fun InvoiceCaptureScreen(
                     },
                     modifier = Modifier.fillMaxSize()
                 )
-                
-                // Camera controls overlay
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.BottomCenter
+            }
+            
+            // Camera controls below preview
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Gallery button
+                FloatingActionButton(
+                    onClick = { 
+                        if (modelStatus == ModelStatus.READY) {
+                            galleryLauncher.launch("image/*")
+                        }
+                    },
+                    modifier = Modifier.size(56.dp),
+                    containerColor = if (modelStatus == ModelStatus.READY) 
+                        MaterialTheme.colorScheme.primary 
+                    else 
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(24.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Gallery button
-                        FloatingActionButton(
-                            onClick = { 
-                                if (modelStatus == ModelStatus.READY) {
-                                    galleryLauncher.launch("image/*")
-                                }
-                            },
-                            modifier = Modifier.size(56.dp),
-                            containerColor = if (modelStatus == ModelStatus.READY) 
-                                MaterialTheme.colorScheme.secondary 
-                            else 
-                                MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
-                        ) {
-                            Text(
-                                "📷", 
-                                fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-                                color = if (modelStatus == ModelStatus.READY) 
-                                    MaterialTheme.colorScheme.onSecondary 
-                                else 
-                                    MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)
+                    Text(
+                        "�️", 
+                        fontSize = MaterialTheme.typography.headlineSmall.fontSize
+                    )
+                }
+                
+                // Capture button
+                FloatingActionButton(
+                    onClick = {
+                        if (modelStatus == ModelStatus.READY) {
+                            cameraService.capturePhoto(
+                                onImageCaptured = { uri -> 
+                                    val bitmap = ImageUtils.uriToBitmap(context, uri, rotateForPortrait = true)
+                                    bitmap?.let { bmp ->
+                                        viewModel.processReceiptImage(bmp)
+                                    }
+                                },
+                                onError = { /* Handle error */ }
                             )
                         }
-                        
-                        // Capture button
-                        FloatingActionButton(
-                            onClick = {
-                                if (modelStatus == ModelStatus.READY) {
-                                    cameraService.capturePhoto(
-                                        onImageCaptured = { uri -> 
-                                            val bitmap = ImageUtils.uriToBitmap(context, uri, rotateForPortrait = true)
-                                            bitmap?.let { bmp ->
-                                                viewModel.processReceiptImage(bmp)
-                                            }
-                                        },
-                                        onError = { /* Handle error */ }
-                                    )
-                                }
-                            },
-                            modifier = Modifier.size(72.dp),
-                            containerColor = if (modelStatus == ModelStatus.READY) 
-                                MaterialTheme.colorScheme.primary 
-                            else 
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            shape = CircleShape
-                        ) {
-                            Text(
-                                "📸", 
-                                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                                color = if (modelStatus == ModelStatus.READY) 
-                                    MaterialTheme.colorScheme.onPrimary 
-                                else 
-                                    MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
-                            )
-                        }
-                        
-                        // Toggle camera/list button
-                        FloatingActionButton(
-                            onClick = { showCamera = false },
-                            modifier = Modifier.size(56.dp),
-                            containerColor = MaterialTheme.colorScheme.tertiary
-                        ) {
-                            Icon(
-                                Icons.Default.List,
-                                contentDescription = "View receipts",
-                                tint = MaterialTheme.colorScheme.onTertiary
-                            )
-                        }
-                    }
+                    },
+                    modifier = Modifier.size(72.dp),
+                    containerColor = if (modelStatus == ModelStatus.READY) 
+                        MaterialTheme.colorScheme.primary 
+                    else 
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                    shape = CircleShape
+                ) {
+                    Text(
+                        "📸", 
+                        fontSize = MaterialTheme.typography.headlineMedium.fontSize
+                    )
+                }
+                
+                // Toggle camera/list button
+                FloatingActionButton(
+                    onClick = { showCamera = false },
+                    modifier = Modifier.size(56.dp),
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        Icons.Default.List,
+                        contentDescription = "View receipts",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
         }
@@ -334,47 +281,40 @@ fun InvoiceCaptureScreen(
             }
         }
         
-        // Success message for processed receipt
+        // Compact success message for processed receipt
         uiState.lastProcessedReceipt?.let { receipt ->
-            Card(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            "Receipt processed successfully!",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                AssistChip(
+                    onClick = { viewModel.clearLastProcessedReceipt() },
+                    label = { 
+                        Text("${receipt.merchantName} • $${receipt.totalAmount}")
+                    },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
                         )
-                        Text(
-                            "${receipt.merchantName} • $${receipt.totalAmount}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    IconButton(onClick = { viewModel.clearLastProcessedReceipt() }) {
+                    },
+                    trailingIcon = {
                         Icon(
                             Icons.Default.Close,
                             contentDescription = "Dismiss",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            modifier = Modifier.size(16.dp)
                         )
-                    }
-                }
+                    },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        leadingIconContentColor = MaterialTheme.colorScheme.primary,
+                        trailingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                )
             }
         }
 
@@ -420,7 +360,7 @@ fun InvoiceCaptureScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -431,7 +371,11 @@ fun InvoiceCaptureScreen(
                 )
                 
                 if (hasCameraPermission) {
-                    IconButton(onClick = { showCamera = true }) {
+                    FloatingActionButton(
+                        onClick = { showCamera = true },
+                        modifier = Modifier.size(56.dp),
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
                         Text("📸")
                     }
                 }
