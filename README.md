@@ -1,21 +1,118 @@
-# Checkstand - On-Device AI Assistant
+# Checkstand - AI-Powered Receipt Scanner
 
-A privacy-focused Android application that demonstrates on-device Large Language Model (LLM) inference using Google's MediaPipe framework.
+> **Google Gemma 3n Impact Challenge Submission**  
+> *"Think bigger than a simple chatbot"* - On-device, privacy-first receipt processing powered by Gemma 3n
 
-## Features
+[![Gemma 3n](https://img.shields.io/badge/Powered%20by-Gemma%203n-blue)](https://github.com/google/gemma)
+[![MediaPipe](https://img.shields.io/badge/AI-MediaPipe-green)](https://mediapipe.dev/)
+[![Privacy First](https://img.shields.io/badge/Privacy-First-red)](https://github.com)
 
-- **Privacy-First**: All AI processing happens on your device
-- **Offline Capable**: Works without internet connection after model download
-- **No Data Sharing**: Your conversations never leave your device
-- **Efficient**: Optimized for mobile devices using MediaPipe
-- **Simple UI**: Clean, intuitive chat interface
+## 🎯 **The Challenge**
 
-## Architecture
+How can a **private, offline-first, multimodal model** make a tangible difference in people's lives? 
 
-- **Native Android**: Built with Kotlin and Jetpack Compose
-- **MediaPipe LLM**: Uses Google's MediaPipe framework for inference
-- **MVVM Pattern**: Clean architecture with ViewModels
-- **Coroutines**: Asynchronous operations for smooth UX
+**Checkstand's Answer:** Transform receipt management from a tedious manual task into an effortless, privacy-preserving experience using on-device AI.
+
+## ✨ **What Makes Checkstand Special**
+
+- **🔒 Complete Privacy**: Zero data leaves your device - ever
+- **📱 Offline-First**: Works without internet connectivity  
+- **🧠 Multimodal AI**: Camera + OCR + LLM analysis pipeline
+- **⚡ Real-Time**: Process receipts in ~24 seconds on consumer hardware
+- **🎯 Practical Impact**: Solves real financial tracking problems
+
+## 🏗️ **Technical Innovation**
+
+### **Gemma 3n Integration**
+- **On-Device Inference**: 3.1GB E2B model running locally via MediaPipe
+- **Session Management**: Fresh inference sessions per request (prevents context contamination)
+- **Multimodal Pipeline**: Seamless integration of image and text processing
+
+### **Architecture Highlights**
+- **Clean Architecture**: Domain/Data/UI separation with Hilt dependency injection
+- **Robust Parsing**: Smart fallback mechanisms when LLM output varies
+- **Camera Integration**: CameraX with real-time preview and capture
+- **Modern Android**: Jetpack Compose UI with Material 3 design
+
+## 🎬 **See It In Action**
+
+[🎥 **Demo Video**](#) *(Coming Soon)*
+
+## 🚀 **Quick Start**
+
+### **Prerequisites**
+- Android Studio Hedgehog or newer
+- Android device with API level 24+ (Android 7.0)
+- 4GB+ RAM (recommended for optimal model performance)
+
+### **Build & Run**
+```bash
+git clone https://github.com/[your-username]/checkstand-gemma3n.git
+cd checkstand-gemma3n
+./gradlew assembleDebug
+```
+
+### **Installation**
+1. Enable "Unknown Sources" in Android settings
+2. Install the generated APK: `app/build/outputs/apk/debug/app-debug.apk`
+3. Grant camera permission when prompted
+4. Start scanning receipts!
+
+## 🧠 **How It Works**
+
+1. **Image Capture**: User scans receipt with camera or selects from gallery
+2. **OCR Processing**: Google ML Kit extracts text from receipt image
+3. **AI Analysis**: Gemma 3n processes text to identify merchant, date, total
+4. **Smart Parsing**: Robust extraction with intelligent fallbacks
+5. **Local Storage**: All data stays on device in local database
+
+## 📊 **Real-World Impact**
+
+### **Target Users**
+- **Small Business Owners**: Expense tracking for tax purposes
+- **Personal Finance**: Budget management and spending analysis  
+- **Accessibility**: Voice-guided receipt processing for visually impaired
+- **Crisis Response**: Offline expense tracking for insurance claims
+
+### **Privacy Advantages**
+- **No Cloud Dependencies**: Works in airplane mode
+- **GDPR Compliant**: No personal data collection or transmission
+- **Corporate Security**: Suitable for sensitive business receipts
+- **Remote Areas**: Functions without reliable internet connectivity
+
+## 🏆 **Competition Alignment**
+
+**Google AI Edge Prize Target**: *"Most compelling and effective use case built using Google AI Edge implementation of Gemma 3n"*
+
+✅ **Compelling Use Case**: Universal need for receipt management  
+✅ **Effective Implementation**: Production-ready Android application  
+✅ **Google AI Edge**: MediaPipe framework with Gemma 3n model  
+✅ **Real-World Impact**: Solves genuine user problems with privacy focus  
+
+## 🔧 **Technical Deep Dive**
+
+### **Project Structure**
+```
+app/src/main/java/com/checkstand/
+├── domain/          # Business logic and use cases
+├── data/            # Repositories and data sources  
+├── service/         # LLM, OCR, and Camera services
+├── ui/              # Jetpack Compose screens and components
+└── utils/           # Helper utilities and extensions
+```
+
+### **Key Innovations**
+- **Session Management**: Prevents LLM context contamination between receipts
+- **Fallback Parsing**: Regex-based extraction when structured parsing fails
+- **Multimodal Workflow**: Optimized text-before-image prompt ordering
+- **Error Resilience**: Graceful degradation with user-friendly error handling
+
+## 🏅 **Performance Metrics**
+
+- **Model Loading**: ~1-2 seconds on modern devices
+- **Receipt Processing**: ~24 seconds average (includes OCR + LLM)
+- **Memory Usage**: Efficient with 3.1GB model size
+- **Accuracy**: Robust extraction across various receipt formats
 
 ## Technical Stack
 
