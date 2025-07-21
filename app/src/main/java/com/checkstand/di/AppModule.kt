@@ -38,8 +38,11 @@ object AppModule {
      */
     @Provides
     @Singleton
-    fun provideReceiptRepository(llmService: LLMService): ReceiptRepository {
-        return MediaPipeReceiptRepository(llmService)
+    fun provideReceiptRepository(
+        llmService: LLMService,
+        ocrService: OCRService
+    ): ReceiptRepository {
+        return MediaPipeReceiptRepository(llmService, ocrService)
     }
     
     /**

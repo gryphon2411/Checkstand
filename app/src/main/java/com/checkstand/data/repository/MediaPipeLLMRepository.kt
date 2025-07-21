@@ -9,6 +9,7 @@ import com.checkstand.domain.model.ReceiptItem
 import com.checkstand.domain.repository.ReceiptRepository
 import com.checkstand.domain.repository.ModelInfo
 import com.checkstand.service.LLMService
+import com.checkstand.service.OCRService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -20,9 +21,10 @@ import java.util.*
  * Implementation of ReceiptRepository using MediaPipe LLM Service
  */
 class MediaPipeReceiptRepository(
-    private val llmService: LLMService
+    private val llmService: LLMService,
+    private val ocrService: OCRService
 ) : ReceiptRepository {
-    
+
     companion object {
         private const val TAG = "MediaPipeReceiptRepo"
         private const val MODEL_NAME = "Gemma-3n E4B"
@@ -49,77 +51,63 @@ class MediaPipeReceiptRepository(
 
     override fun analyzeReceiptText(rawText: String): Flow<Receipt> {
         Log.d(TAG, "Analyzing receipt text: ${rawText.take(100)}...")
-        
+
         return flow {
             val prompt = buildReceiptAnalysisPrompt(rawText)
-            
+            Log.d(TAG, "Sending prompt to LLM: ${prompt.take(200)}...")
+
             llmService.generateResponse(prompt).collect { response ->
+                Log.d(TAG, "LLM response received: ${response.take(200)}...")
                 try {
                     val receipt = parseReceiptFromResponse(response, rawText)
+                    Log.d(TAG, "Successfully parsed receipt: ${receipt.merchantName}, total: ${receipt.totalAmount}")
                     emit(receipt)
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to parse receipt from response", e)
-                    // Emit a basic receipt with raw text
-                    emit(createBasicReceipt(rawText))
+                    Log.e(TAG, "Full LLM response: $response")
+                    // Try to extract some basic info even if parsing fails
+                    val fallbackReceipt = createFallbackReceipt(rawText, response)
+                    Log.d(TAG, "Created fallback receipt with total: ${fallbackReceipt.totalAmount}")
+                    emit(fallbackReceipt)
                 }
             }
         }
     }
-    
+
     override fun analyzeReceiptImage(image: Bitmap): Flow<Receipt> {
-        Log.d(TAG, "Analyzing receipt image directly...")
-        
+        Log.d(TAG, "Analyzing receipt image by extracting text first...")
+
         return flow {
-            // For now, we'll use a text-based prompt since the current MediaPipe model
-            // may not support multimodal input. This is prepared for future multimodal models.
-            val prompt = """
-                I have captured a receipt image that I need to analyze. 
-                Please help me structure the receipt information in this format:
+            try {
+                Log.d(TAG, "Starting OCR text extraction from image...")
+                val rawText = ocrService.extractTextFromImage(image)
+                Log.d(TAG, "OCR extraction complete. Text length: ${rawText.length}")
+                Log.d(TAG, "OCR extracted text preview: ${rawText.take(200)}...")
                 
-                MERCHANT: [merchant name]
-                DATE: [date in yyyy-MM-dd format]
-                TOTAL: [total amount as decimal number]
-                ITEMS:
-                - [item name] | [quantity] | [unit price] | [total price]
-                
-                Since I cannot provide the image directly to this text model, 
-                please provide a template response that shows the expected format
-                for receipt analysis.
-            """.trimIndent()
-            
-            llmService.generateResponseWithImage(prompt, image).collect { response ->
-                try {
-                    // For now, create a basic receipt indicating image was processed
-                    val receipt = Receipt(
-                        id = java.util.UUID.randomUUID().toString(),
-                        merchantName = "Image Captured",
-                        totalAmount = java.math.BigDecimal.ZERO,
-                        date = java.util.Date(),
-                        items = listOf(
-                            com.checkstand.domain.model.ReceiptItem(
-                                name = "Receipt from image - pending analysis",
-                                quantity = 1,
-                                unitPrice = java.math.BigDecimal.ZERO
-                            )
-                        ),
-                        category = com.checkstand.domain.model.ExpenseCategory.UNCATEGORIZED,
-                        rawText = "Receipt processed from image"
-                    )
-                    emit(receipt)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to process receipt image", e)
-                    emit(createBasicReceipt("Receipt image processed"))
+                if (rawText.isNotBlank()) {
+                    // Now that we have the text, delegate to the text analysis function
+                    analyzeReceiptText(rawText).collect { receipt ->
+                        // We can enhance the receipt with the image info if needed
+                        // For now, just emit the analyzed receipt
+                        emit(receipt)
+                    }
+                } else {
+                    Log.w(TAG, "OCR service returned empty text from image.")
+                    emit(createFallbackReceipt("Could not extract text from image.", "No OCR text available"))
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to analyze receipt image", e)
+                emit(createFallbackReceipt("Error processing receipt image.", "Error: ${e.message}"))
             }
         }
     }
 
     override suspend fun categorizeExpense(merchantName: String, items: List<String>): ExpenseCategory {
         Log.d(TAG, "Categorizing expense for merchant: $merchantName")
-        
+
         return try {
             val prompt = buildCategorizationPrompt(merchantName, items)
-            
+
             // For now, use simple rules-based categorization
             // In the future, this could use the LLM for more sophisticated categorization
             categorizeByRules(merchantName, items)
@@ -176,6 +164,7 @@ class MediaPipeReceiptRepository(
     }
 
     private fun parseReceiptFromResponse(response: String, rawText: String): Receipt {
+        Log.d(TAG, "Parsing LLM response for receipt data...")
         val lines = response.lines()
         var merchantName = "Unknown Merchant"
         var date = Date()
@@ -183,48 +172,74 @@ class MediaPipeReceiptRepository(
         val items = mutableListOf<ReceiptItem>()
         
         for (line in lines) {
+            val trimmedLine = line.trim()
             when {
-                line.startsWith("MERCHANT:") -> {
-                    merchantName = line.substringAfter("MERCHANT:").trim()
+                trimmedLine.startsWith("MERCHANT:", ignoreCase = true) -> {
+                    merchantName = trimmedLine.substringAfter(":").trim()
+                    Log.d(TAG, "Parsed merchant: $merchantName")
                 }
-                line.startsWith("DATE:") -> {
-                    val dateStr = line.substringAfter("DATE:").trim()
+                trimmedLine.startsWith("DATE:", ignoreCase = true) -> {
+                    val dateStr = trimmedLine.substringAfter(":").trim()
                     try {
                         date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(dateStr) ?: Date()
+                        Log.d(TAG, "Parsed date: $date")
                     } catch (e: Exception) {
                         Log.w(TAG, "Failed to parse date: $dateStr")
                     }
                 }
-                line.startsWith("TOTAL:") -> {
-                    val totalStr = line.substringAfter("TOTAL:").trim()
+                trimmedLine.startsWith("TOTAL:", ignoreCase = true) -> {
+                    val totalStr = trimmedLine.substringAfter(":").trim()
                     try {
-                        total = BigDecimal(totalStr)
+                        // Remove currency symbols and parse
+                        val cleanTotal = totalStr.replace("$", "").replace(",", "").trim()
+                        total = BigDecimal(cleanTotal)
+                        Log.d(TAG, "Parsed total: $total")
                     } catch (e: Exception) {
                         Log.w(TAG, "Failed to parse total: $totalStr")
+                        // Try to extract amount using regex
+                        extractAmountFromLine(totalStr)?.let { 
+                            total = it
+                            Log.d(TAG, "Extracted total using regex: $total")
+                        }
                     }
                 }
-                line.startsWith("- ") -> {
-                    val parts = line.substring(2).split(" | ")
+                trimmedLine.startsWith("- ") -> {
+                    val parts = trimmedLine.substring(2).split(" | ")
                     if (parts.size >= 4) {
                         try {
                             val item = ReceiptItem(
                                 name = parts[0].trim(),
                                 quantity = parts[1].trim().toIntOrNull() ?: 1,
-                                unitPrice = BigDecimal(parts[2].trim()),
-                                totalPrice = BigDecimal(parts[3].trim())
+                                unitPrice = BigDecimal(parts[2].trim().replace("$", "")),
+                                totalPrice = BigDecimal(parts[3].trim().replace("$", ""))
                             )
                             items.add(item)
+                            Log.d(TAG, "Parsed item: ${item.name}")
                         } catch (e: Exception) {
-                            Log.w(TAG, "Failed to parse item: $line")
+                            Log.w(TAG, "Failed to parse item: $trimmedLine")
                         }
                     }
                 }
             }
         }
         
+        // If we still have zero total, try to extract from the raw text or response
+        if (total == BigDecimal.ZERO) {
+            Log.d(TAG, "Total is still zero, attempting fallback extraction...")
+            extractAmountFromLine(response)?.let { 
+                total = it
+                Log.d(TAG, "Found total in response: $total")
+            } ?: run {
+                extractAmountFromLine(rawText)?.let { 
+                    total = it
+                    Log.d(TAG, "Found total in raw text: $total")
+                }
+            }
+        }
+        
         val category = categorizeByRules(merchantName, items.map { it.name })
         
-        return Receipt(
+        val receipt = Receipt(
             merchantName = merchantName,
             totalAmount = total,
             date = date,
@@ -232,6 +247,9 @@ class MediaPipeReceiptRepository(
             category = category,
             rawText = rawText
         )
+        
+        Log.d(TAG, "Final parsed receipt: merchant='${receipt.merchantName}', total='${receipt.totalAmount}', items=${receipt.items.size}")
+        return receipt
     }
 
     private fun createBasicReceipt(rawText: String): Receipt {
@@ -242,6 +260,81 @@ class MediaPipeReceiptRepository(
             rawText = rawText,
             category = ExpenseCategory.UNCATEGORIZED
         )
+    }
+
+    private fun createFallbackReceipt(rawText: String, llmResponse: String): Receipt {
+        Log.d(TAG, "Creating fallback receipt from raw text and LLM response")
+        
+        // Try to extract basic information even when structured parsing fails
+        var merchantName = "Unknown Merchant"
+        var total = BigDecimal.ZERO
+        val items = mutableListOf<ReceiptItem>()
+        
+        // Look for merchant patterns in both raw text and LLM response
+        val allText = "$rawText\n$llmResponse"
+        val lines = allText.lines()
+        
+        // Try to find total amount with various patterns
+        for (line in lines) {
+            val lineLower = line.lowercase()
+            
+            // Look for merchant name patterns
+            if (merchantName == "Unknown Merchant") {
+                when {
+                    line.contains("store", ignoreCase = true) ||
+                    line.contains("market", ignoreCase = true) ||
+                    line.contains("shop", ignoreCase = true) -> {
+                        merchantName = line.trim().take(50)
+                    }
+                }
+            }
+            
+            // Look for total patterns - more flexible than the strict parser
+            when {
+                lineLower.contains("total") && lineLower.contains("$") -> {
+                    extractAmountFromLine(line)?.let { total = it }
+                }
+                lineLower.startsWith("total:") -> {
+                    extractAmountFromLine(line.substringAfter(":"))?.let { total = it }
+                }
+                line.matches(Regex(".*\\$\\d+\\.\\d{2}.*")) -> {
+                    extractAmountFromLine(line)?.let { 
+                        if (total == BigDecimal.ZERO) total = it 
+                    }
+                }
+            }
+        }
+        
+        Log.d(TAG, "Fallback receipt created: merchant='$merchantName', total='$total'")
+        
+        return Receipt(
+            merchantName = merchantName,
+            totalAmount = total,
+            date = Date(),
+            items = items,
+            rawText = rawText,
+            category = ExpenseCategory.UNCATEGORIZED
+        )
+    }
+    
+    private fun extractAmountFromLine(line: String): BigDecimal? {
+        // Look for dollar amounts in various formats
+        val patterns = listOf(
+            Regex("\\$(\\d+\\.\\d{2})"),
+            Regex("(\\d+\\.\\d{2})"),
+            Regex("\\$(\\d+)")
+        )
+        
+        for (pattern in patterns) {
+            pattern.find(line)?.let { match ->
+                try {
+                    return BigDecimal(match.groupValues[1])
+                } catch (e: Exception) {
+                    // Continue to next pattern
+                }
+            }
+        }
+        return null
     }
 
     private fun categorizeByRules(merchantName: String, items: List<String>): ExpenseCategory {

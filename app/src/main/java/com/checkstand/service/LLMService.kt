@@ -19,7 +19,6 @@ class LLMService @Inject constructor(
 ) {
     
     private var llmInference: LlmInference? = null
-    private var llmSession: LlmInferenceSession? = null
     private var isModelLoaded = false
     private val modelManager = ModelManager(context)
     
@@ -75,27 +74,18 @@ class LLMService @Inject constructor(
                 llmInference = LlmInference.createFromOptions(context, options)
                 
                 modelStatusService.updateProgress(0.8f)
-                modelStatusService.updateMessage("Creating inference session...")
+                modelStatusService.updateMessage("Model ready for processing...")
                 
-                Log.d(TAG, "Creating LLM session...")
-                llmSession = LlmInferenceSession.createFromOptions(
-                    llmInference!!,
-                    LlmInferenceSession.LlmInferenceSessionOptions.builder()
-                        .setTopK(40)          // Standard values from Gallery app
-                        .setTopP(0.95f)       
-                        .setTemperature(0.7f)
-                        // Note: Vision modality may require specific model support
-                        .build()
-                )
+                Log.d(TAG, "LLM inference instance created successfully")
                 
-                // Force garbage collection after session creation
+                // Force garbage collection after inference creation
                 System.gc()
                 
                 modelStatusService.updateProgress(1.0f)
                 isModelLoaded = true
                 modelStatusService.updateStatus(ModelStatus.READY)
                 modelStatusService.updateMessage("Model ready for processing")
-                Log.d(TAG, "Model and session loaded successfully!")
+                Log.d(TAG, "Model loaded successfully!")
                 true
             } catch (e: OutOfMemoryError) {
                 Log.e(TAG, "Out of memory while loading model", e)
@@ -122,7 +112,7 @@ class LLMService @Inject constructor(
     }
     
     fun generateResponse(prompt: String): Flow<String> = flow {
-        if (!isModelLoaded || llmSession == null) {
+        if (!isModelLoaded || llmInference == null) {
             Log.e(TAG, "Cannot generate response: model not loaded")
             emit("Error: Model not loaded")
             return@flow
@@ -130,12 +120,17 @@ class LLMService @Inject constructor(
         
         try {
             Log.d(TAG, "Generating response for prompt: ${prompt.take(50)}...")
-            val fullPrompt = "<start_of_turn>user\n$prompt<end_of_turn>\n<start_of_turn>model\n"
             
-            llmSession?.let { session ->
-                // First add the prompt to the session
-                session.addQueryChunk(fullPrompt)
-                // Then generate response without parameters
+            // Create a fresh session for each request to avoid context contamination
+            val sessionOptions = LlmInferenceSession.LlmInferenceSessionOptions.builder()
+                .setTopK(40)
+                .setTopP(0.95f)
+                .setTemperature(0.8f)
+                .build()
+                
+            LlmInferenceSession.createFromOptions(llmInference!!, sessionOptions).use { session ->
+                Log.d(TAG, "Created fresh session for receipt processing")
+                session.addQueryChunk(prompt)
                 val response = session.generateResponse()
                 Log.d(TAG, "Generated response: ${response.take(100)}...")
                 emit(response)
@@ -147,7 +142,7 @@ class LLMService @Inject constructor(
     }.flowOn(Dispatchers.IO)
     
     fun generateResponseWithImage(prompt: String, image: Bitmap): Flow<String> = flow {
-        if (!isModelLoaded || llmSession == null) {
+        if (!isModelLoaded || llmInference == null) {
             Log.e(TAG, "Cannot generate response: model not loaded")
             emit("Error: Model not loaded")
             return@flow
@@ -155,14 +150,23 @@ class LLMService @Inject constructor(
         
         try {
             Log.d(TAG, "Generating response with image for prompt: ${prompt.take(50)}...")
-            Log.w(TAG, "Image processing with MediaPipe LLM not yet implemented for this model")
+            Log.d(TAG, "Image dimensions: ${image.width}x${image.height}")
             
-            // For now, fallback to text-only processing
-            // This would need a multimodal model that supports images
-            llmSession?.let { session ->
+            // Create a fresh session for image processing
+            val sessionOptions = LlmInferenceSession.LlmInferenceSessionOptions.builder()
+                .setTopK(40)
+                .setTopP(0.95f)
+                .setTemperature(0.8f)
+                .build()
+                
+            LlmInferenceSession.createFromOptions(llmInference!!, sessionOptions).use { session ->
+                Log.d(TAG, "Created fresh session for image processing")
+                
+                // For now, process as text-only since multimodal support requires specific setup
+                // The image is processed via OCR in the repository layer
                 session.addQueryChunk(prompt)
                 val response = session.generateResponse()
-                Log.d(TAG, "Generated text-only response: ${response.take(100)}...")
+                Log.d(TAG, "Generated response: ${response.take(100)}...")
                 emit(response)
             }
         } catch (e: Exception) {
@@ -178,9 +182,7 @@ class LLMService @Inject constructor(
     fun getModelManager(): ModelManager = modelManager
     
     fun cleanup() {
-        llmSession?.close()
         llmInference?.close()
-        llmSession = null
         llmInference = null
         isModelLoaded = false
     }
