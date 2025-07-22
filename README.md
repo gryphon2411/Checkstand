@@ -52,8 +52,8 @@ In today's economy, tracking expenses is crucial. Yet, our most frequent purchas
 
 ### **Build & Run**
 ```bash
-git clone https://github.com/[your-username]/checkstand-gemma3n.git
-cd checkstand-gemma3n
+git clone https://github.com/gryphon2411/Checkstand.git
+cd Checkstand
 ./gradlew assembleDebug
 ```
 
