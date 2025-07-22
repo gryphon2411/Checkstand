@@ -6,9 +6,11 @@
 
 ## Executive Summary
 
-Checkstand represents a paradigm shift in receipt processing applications by implementing a fully on-device, privacy-preserving multimodal AI pipeline. Built specifically for the Google Gemma 3n Impact Challenge, this application demonstrates how sophisticated AI can solve real-world problems without compromising user privacy.
+Checkstand is a financial empowerment tool designed to help users take control of their spending by digitizing physical receipts. In a world where our most frequent purchases from supermarkets and local shops create a "data black hole," Checkstand provides the crucial, previously missing insights.
 
-**Key Innovation**: Complete financial document processing using Gemma 3n without any data transmission, making it suitable for sensitive business environments, areas with poor connectivity, and privacy-conscious users.
+To deliver this powerful capability with the trust it requires, Checkstand was built with an uncompromising privacy-first architecture. By leveraging Google's on-device Gemma 3n model, the entire AI pipeline—from OCR to language analysis—runs locally. No user data ever leaves the phone.
+
+**Key Innovation**: A production-ready, on-device multimodal AI that provides tangible financial education and empowerment, made possible *because* of its privacy-preserving design.
 
 ---
 

@@ -4,31 +4,36 @@
 
 ---
 
-## **SCENE 1: Hook & Problem Statement** *(0:00 - 0:45)*
+## **SCENE 1: The Financial Black Hole** *(0:00 - 0:30)*
 
 ### **Opening Hook** *(0:00 - 0:15)*
-**[Show pile of crumpled receipts on desk]**
+**[Show pile of crumpled receipts on desk next to a smartphone showing a banking app. The banking app shows transactions like "SuperMart $78.50" but no item details.]**
 
-**NARRATOR**: "We've all been here. Receipts scattered everywhere, trying to track expenses manually, wondering where our money went. But what if I told you there's a better way - one that doesn't compromise your privacy?"
+**NARRATOR**: "We try to track our spending, but our bank app only tells us *where* we spent money, not *what* we bought. These receipts... they're a financial black hole. How can you control your budget if you don't know where your money is really going?"
 
-### **Problem Setup** *(0:15 - 0:45)*
-**[Split screen: Manual receipt entry vs cloud upload concerns]**
+### **The Core Problem** *(0:15 - 0:30)*
+**[Quick cuts: coffee shop receipt, grocery store receipt, hardware store receipt.]**
 
-**NARRATOR**: "Traditional solutions force you to choose: either spend hours manually entering data, or upload your financial information to the cloud where it can be breached, sold, or accessed by third parties. There has to be a better way."
+**NARRATOR**: "Our most frequent purchases from supermarkets, cafes, and local shops are often invisible in our digital records. This is where we lose control."
 
 ---
 
-## **SCENE 2: Solution Introduction** *(0:45 - 1:15)*
+## **SCENE 2: The Solution - Private Financial Empowerment** *(0:30 - 1:15)*
 
-### **Meet Checkstand** *(0:45 - 1:00)*
+### **Meet Checkstand** *(0:30 - 0:45)*
 **[Show Checkstand app loading on phone]**
 
-**NARRATOR**: "Meet Checkstand - AI-powered receipt scanning that works completely offline. Built for the Google Gemma 3n Impact Challenge, Checkstand proves that privacy and convenience don't have to be mutually exclusive."
+**NARRATOR**: "Meet Checkstand. It's a powerful, simple tool designed to solve this exact problem. It turns your physical receipts into actionable financial data, right on your phone."
+
+### **The Trust Foundation: On-Device AI** *(0:45 - 1:00)*
+**[Show animation: A receipt is scanned, and a 'lock' icon stays on the phone. Data doesn't go to a cloud.]**
+
+**NARRATOR**: "But to trust an app with your financial life, you need absolute privacy. That's why we built Checkstand with Google's on-device Gemma 3n model. All the AI processing happens here, on your phone. Nothing is ever uploaded, shared, or seen by anyone else."
 
 ### **The "Bigger Than Chatbot" Moment** *(1:00 - 1:15)*
 **[Show Google Gemma 3n logo transition to Checkstand interface]**
 
-**NARRATOR**: "The challenge asked us to think bigger than a simple chatbot. Checkstand answers that call by turning your phone into a privacy-preserving financial assistant that never sends your data anywhere."
+**NARRATOR**: "The challenge asked us to think bigger than a chatbot. Checkstand answers that call by delivering true financial empowerment, made possible *because* of its private, on-device AI."
 
 ### **Development Journey Insight** *(1:15 - 1:30)*
 **[Show quick montage: React Native logo → Error screen → Android logo]**

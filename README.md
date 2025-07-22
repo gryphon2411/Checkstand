@@ -1,23 +1,25 @@
 # Checkstand - AI-Powered Receipt Scanner
 
 > **Google Gemma 3n Impact Challenge Submission**  
-> *"Think bigger than a simple chatbot"* - On-device, privacy-first receipt processing powered by Gemma 3n
+> *"Think bigger than a simple chatbot"* - Financial empowerment through private, on-device receipt intelligence.
 
 [![Gemma 3n](https://img.shields.io/badge/Powered%20by-Gemma%203n-blue)](https://github.com/google/gemma)
 [![MediaPipe](https://img.shields.io/badge/AI-MediaPipe-green)](https://mediapipe.dev/)
-[![Privacy First](https://img.shields.io/badge/Privacy-First-red)](https://github.com)
+[![Privacy First](https://img.shields.io/badge/Trust-Uncompromising%20Privacy-red)](https://github.com)
 
-## 🎯 **The Challenge**
+## 🎯 The Problem: Financial Data Black Holes
 
-How can a **private, offline-first, multimodal model** make a tangible difference in people's lives? 
+In today's economy, tracking expenses is crucial. Yet, our most frequent purchases—from supermarkets, cafes, and local shops—often end up as paper receipts, creating a black hole in our financial data. How can people take control of their spending if they can't easily track it?
 
-**Checkstand's Answer:** Transform receipt management from a tedious manual task into an effortless, privacy-preserving experience using on-device AI.
+**Checkstand's Answer:** Empower users with a tool that digitizes physical receipts, providing crucial financial insights that were previously lost.
 
-## ✨ **What Makes Checkstand Special**
+## ✨ What Makes Checkstand Special
 
-- **🔒 Complete Privacy**: Zero data leaves your device - ever
-- **📱 Offline-First**: Works without internet connectivity  
-- **🧠 Multimodal AI**: Camera + OCR + LLM analysis pipeline
+- **� Financial Empowerment**: Finally track spending from supermarkets and local shops that don't offer digital records.
+- **🎓 Educational Insights**: Understand where your money goes, identify spending patterns, and take control of your budget.
+- **� Uncompromising Privacy**: Your financial data is sensitive. Checkstand processes everything on-device, so your information never leaves your phone. It's your data, your insights, your control.
+- **🧠 Multimodal AI**: A powerful on-device pipeline combining Camera, OCR, and Gemma 3n to understand any receipt.
+- **📱 Offline-First**: Works anywhere, anytime, without needing an internet connection.
 - **⚡ Real-Time**: Process receipts in ~24 seconds on consumer hardware
 - **🎯 Practical Impact**: Solves real financial tracking problems
 
