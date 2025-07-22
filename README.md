@@ -15,9 +15,9 @@ In today's economy, tracking expenses is crucial. Yet, our most frequent purchas
 
 ## ✨ What Makes Checkstand Special
 
-- **� Financial Empowerment**: Finally track spending from supermarkets and local shops that don't offer digital records.
+- **💰 Financial Empowerment**: Finally track spending from supermarkets and local shops that don't offer digital records.
 - **🎓 Educational Insights**: Understand where your money goes, identify spending patterns, and take control of your budget.
-- **� Uncompromising Privacy**: Your financial data is sensitive. Checkstand processes everything on-device, so your information never leaves your phone. It's your data, your insights, your control.
+- **🔒 Uncompromising Privacy**: Your financial data is sensitive. Checkstand processes everything on-device, so your information never leaves your phone. It's your data, your insights, your control.
 - **🧠 Multimodal AI**: A powerful on-device pipeline combining Camera, OCR, and Gemma 3n to understand any receipt.
 - **📱 Offline-First**: Works anywhere, anytime, without needing an internet connection.
 - **⚡ Real-Time**: Process receipts in ~24 seconds on consumer hardware
