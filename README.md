@@ -26,7 +26,7 @@ In today's economy, tracking expenses is crucial. Yet, our most frequent purchas
 ## 🏗️ **Technical Innovation**
 
 ### **Gemma 3n Integration**
-- **On-Device Inference**: 3.1GB E2B model running locally via MediaPipe
+- **On-Device Inference**: 4.4GB E4B model running locally via MediaPipe
 - **Session Management**: Fresh inference sessions per request (prevents context contamination)
 - **Multimodal Pipeline**: Seamless integration of image and text processing
 
@@ -116,7 +116,7 @@ app/src/main/java/com/checkstand/
 
 - **Model Loading**: ~1-2 seconds on modern devices
 - **Receipt Processing**: ~24 seconds average (includes OCR + LLM)
-- **Memory Usage**: Efficient with 3.1GB model size
+- **Memory Usage**: Efficient with 4.4GB model size
 - **Accuracy**: Robust extraction across various receipt formats
 
 ## Technical Stack
@@ -125,7 +125,7 @@ app/src/main/java/com/checkstand/
 - **UI**: Jetpack Compose
 - **Architecture**: MVVM
 - **AI Framework**: MediaPipe LLM Inference
-- **Model**: Gemma 2B (int4 quantized)
+- **Model**: Gemma 3n E4B (int4 quantized)
 
 ## Requirements
 
@@ -138,7 +138,7 @@ app/src/main/java/com/checkstand/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/gryphon2411/Checkstand.git
    cd Checkstand
    ```
 
@@ -173,7 +173,7 @@ app/src/main/java/com/checkstand/
 
 1. **Launch the app**
 2. **Complete initial setup** (model should be detected if pushed correctly)
-3. **Start chatting** with the AI assistant
+3. **Start scanning receipts** with the camera or gallery
 4. **Enjoy privacy-focused AI** - all processing happens on your device
 
 ## Model Information
@@ -188,17 +188,17 @@ app/src/main/java/com/checkstand/
 
 - ✅ All inference runs on-device
 - ✅ No data sent to external servers
-- ✅ Conversations stored locally only
+- ✅ Receipt data stored locally only
 - ✅ No telemetry or analytics
 - ✅ No internet required after setup
 
 ## Development Notes
 
 This app demonstrates:
-- Integration with MediaPipe LLM inference
-- Efficient model management
+- Integration with MediaPipe LLM inference for receipt analysis
+- Efficient model management with on-device AI
 - Clean Android architecture patterns
-- Privacy-preserving AI implementation
+- Privacy-preserving multimodal AI implementation
 
 ## Contributing
 
@@ -210,7 +210,7 @@ This app demonstrates:
 
 ## License
 
-MIT License - see LICENSE file for details
+CC BY 4.0 License - see LICENSE file for details
 
 ## Acknowledgments
 
