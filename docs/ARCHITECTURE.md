@@ -2,7 +2,9 @@
 
 ## System Overview
 
-Checkstand implements a sophisticated multimodal AI pipeline that processes receipt images entirely on-device using Google's Gemma 3n model via MediaPipe framework.
+Checkstand implements a sophisticated multimodal AI pipeline designed to empower users financially by digitizing paper receipts with complete privacy. Built on Google's Gemma 3n model via MediaPipe framework, the entire system processes financial data on-device, ensuring users can trust the app with their most sensitive information.
+
+**Architecture Philosophy**: Enable financial empowerment through uncompromising privacy - every component is designed to keep user data local while delivering powerful insights.
 
 ## Architecture Layers
 

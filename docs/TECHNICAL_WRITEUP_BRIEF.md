@@ -3,27 +3,30 @@
 
 ## Executive Summary
 
-Checkstand demonstrates a production-ready implementation of on-device multimodal AI for receipt processing, using Google's Gemma 3n model via MediaPipe framework. This technical writeup details the engineering innovations, architectural decisions, and performance characteristics that make Checkstand a compelling submission for the Google AI Edge Prize.
+Checkstand empowers users to take control of their financial lives by solving the "data black hole" problem - our most frequent purchases from supermarkets, cafes, and local shops often exist only as paper receipts, making spending tracking nearly impossible.
 
-**Key Innovation**: Privacy-preserving financial data processing through intelligent session management, robust parsing algorithms, and multimodal AI pipeline optimization.
+To deliver this financial empowerment with the trust it requires, Checkstand was built with an uncompromising privacy-first architecture using Google's on-device Gemma 3n model via MediaPipe framework. This technical writeup details the engineering innovations that make true financial education possible without compromising user privacy.
+
+**Key Innovation**: Production-ready, on-device multimodal AI that delivers tangible financial empowerment through intelligent session management, robust parsing algorithms, and privacy-preserving pipeline optimization.
 
 ---
 
 ## 1. Technical Challenge & Innovation
 
 ### 1.1 The Core Problem
-Traditional receipt management solutions face a fundamental trade-off:
-- **Manual Entry**: Accurate but time-consuming and error-prone
-- **Cloud Processing**: Fast but compromises privacy and requires connectivity
-- **Basic OCR**: Fast but lacks context understanding for complex receipts
+People struggle to track spending from their most frequent purchases because:
+- **Financial Data Black Holes**: Supermarkets, cafes, and local shops provide only paper receipts, creating gaps in digital financial tracking
+- **Manual Entry**: Accurate but time-consuming, leading most people to abandon expense tracking entirely
+- **Cloud Solutions**: Fast but require trusting sensitive financial data to third parties
+- **Basic OCR**: Extracts text but lacks understanding of context, amounts, and merchant details
 
 ### 1.2 Our Innovation
-Checkstand solves this through **on-device multimodal AI** that combines:
-- **Computer Vision**: Google ML Kit OCR for text extraction
-- **Language Understanding**: Gemma 3n LLM for semantic analysis
-- **Smart Integration**: Custom pipeline optimizing both components
+Checkstand delivers **financial empowerment through trustworthy, on-device AI** that combines:
+- **Computer Vision**: Google ML Kit OCR for robust text extraction from any receipt format
+- **Financial Intelligence**: Gemma 3n LLM provides semantic understanding of spending patterns and merchant details
+- **Privacy Foundation**: Complete on-device processing ensures users can trust the app with their most sensitive financial data
 
-**Result**: Accurate receipt processing with complete privacy preservation.
+**Result**: Users finally have access to their complete spending picture without compromising privacy.
 
 ---
 

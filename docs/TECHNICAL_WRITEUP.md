@@ -283,9 +283,7 @@ data class ReceiptEntity(
 - Modern flagship processors (Snapdragon 8-series, Tensor, etc.)
 
 **Tested Devices**:
-- Google Pixel series (6, 7, 8)
-- Samsung Galaxy S21+, S23+
-- OnePlus 9, 10 Pro
+- OnePlus 8T
 
 ---
 
