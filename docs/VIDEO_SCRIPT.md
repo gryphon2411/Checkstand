@@ -75,7 +75,7 @@
 ### **Under the Hood** *(2:30 - 2:50)*
 **[Show architecture diagram or code snippets]**
 
-**NARRATOR**: "What makes this possible? Checkstand implements a sophisticated multimodal AI pipeline. We use Google's MediaPipe framework to run the 3.1GB Gemma 3n model locally, combined with ML Kit for OCR, all wrapped in a Clean Architecture with robust error handling and smart fallbacks."
+**NARRATOR**: "What makes this possible? Checkstand implements a sophisticated multimodal AI pipeline. We use Google's MediaPipe framework to run the 4.4GB Gemma 3n model locally, combined with ML Kit for OCR, all wrapped in a Clean Architecture with robust error handling and smart fallbacks."
 
 ### **Privacy Focus** *(2:50 - 3:00)*
 **[Show "offline" indicator, airplane mode demo]**
