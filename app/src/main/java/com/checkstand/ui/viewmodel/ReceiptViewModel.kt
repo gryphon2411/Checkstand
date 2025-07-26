@@ -8,11 +8,14 @@ import com.checkstand.domain.model.Receipt
 import com.checkstand.domain.repository.ReceiptRepository
 import com.checkstand.domain.usecase.ProcessReceiptUseCase
 import com.checkstand.domain.usecase.CategorizeExpenseUseCase
+import com.checkstand.data.repository.ReceiptDataRepository
 import com.checkstand.service.ModelStatusService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,14 +24,20 @@ class ReceiptViewModel @Inject constructor(
     private val processReceiptUseCase: ProcessReceiptUseCase,
     private val categorizeExpenseUseCase: CategorizeExpenseUseCase,
     private val modelStatusService: ModelStatusService,
-    private val receiptRepository: ReceiptRepository
+    private val receiptRepository: ReceiptRepository,
+    private val receiptDataRepository: ReceiptDataRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReceiptUiState())
     val uiState: StateFlow<ReceiptUiState> = _uiState.asStateFlow()
 
-    private val _receipts = MutableStateFlow<List<Receipt>>(emptyList())
-    val receipts: StateFlow<List<Receipt>> = _receipts.asStateFlow()
+    // Use the database repository for receipts
+    val receipts: StateFlow<List<Receipt>> = receiptDataRepository.getAllReceipts()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
     
     // Expose model status from the service
     val modelStatus = modelStatusService.modelStatus
@@ -60,7 +69,8 @@ class ReceiptViewModel @Inject constructor(
             processReceiptUseCase(bitmap).collect { result ->
                 result.fold(
                     onSuccess = { receipt ->
-                        _receipts.value = _receipts.value + receipt
+                        // Save to database
+                        receiptDataRepository.insertReceipt(receipt)
                         _uiState.value = _uiState.value.copy(
                             isProcessing = false,
                             currentImageUri = null,
@@ -89,7 +99,8 @@ class ReceiptViewModel @Inject constructor(
             processReceiptUseCase(imageUri).collect { result ->
                 result.fold(
                     onSuccess = { receipt ->
-                        _receipts.value = _receipts.value + receipt
+                        // Save to database
+                        receiptDataRepository.insertReceipt(receipt)
                         _uiState.value = _uiState.value.copy(
                             isProcessing = false,
                             currentImageUri = null,
@@ -115,7 +126,8 @@ class ReceiptViewModel @Inject constructor(
             processReceiptUseCase(text).collect { result ->
                 result.fold(
                     onSuccess = { receipt ->
-                        _receipts.value = _receipts.value + receipt
+                        // Save to database
+                        receiptDataRepository.insertReceipt(receipt)
                         _uiState.value = _uiState.value.copy(
                             isProcessing = false,
                             lastProcessedReceipt = receipt
@@ -137,10 +149,8 @@ class ReceiptViewModel @Inject constructor(
             categorizeExpenseUseCase(receipt).collect { result ->
                 result.fold(
                     onSuccess = { categorizedReceipt ->
-                        val updatedReceipts = _receipts.value.map { r ->
-                            if (r.id == categorizedReceipt.id) categorizedReceipt else r
-                        }
-                        _receipts.value = updatedReceipts
+                        // Update in database
+                        receiptDataRepository.updateReceipt(categorizedReceipt)
                     },
                     onFailure = { error ->
                         _uiState.value = _uiState.value.copy(
@@ -153,7 +163,9 @@ class ReceiptViewModel @Inject constructor(
     }
 
     fun deleteReceipt(receiptId: String) {
-        _receipts.value = _receipts.value.filter { it.id != receiptId }
+        viewModelScope.launch {
+            receiptDataRepository.deleteReceiptById(receiptId)
+        }
     }
 
     fun clearError() {

@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
-    id "kotlin-kapt"
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -90,7 +90,7 @@ dependencies {
     // Hilt Dependency Injection
     implementation libs.hilt.android
     implementation libs.hilt.navigation.compose
-    kapt libs.hilt.android.compiler
+    ksp libs.hilt.android.compiler
     
     // MediaPipe LLM
     implementation libs.mediapipe.tasks.genai
@@ -103,6 +103,12 @@ dependencies {
     
     // Coroutines
     implementation libs.kotlinx.coroutines.android
+    
+    // DataStore for persistence
+    implementation libs.androidx.datastore.preferences
+    
+    // JSON serialization for DataStore
+    implementation 'com.google.code.gson:gson:2.10.1'
     
     // Testing
     testImplementation libs.junit
