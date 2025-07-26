@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.checkstand.domain.model.Receipt
 import com.checkstand.service.CameraService
 import com.checkstand.service.ModelStatus
+import com.checkstand.ui.components.ReceiptSpreadsheetTable
 import com.checkstand.ui.viewmodel.ReceiptViewModel
 import com.checkstand.utils.ImageUtils
 import java.text.SimpleDateFormat
@@ -330,7 +331,7 @@ fun InvoiceCaptureScreen(
             }
         }
         
-        // Receipts list or camera toggle
+        // Financial Spreadsheet or camera toggle
         if (!showCamera || !hasCameraPermission) {
             Row(
                 modifier = Modifier
@@ -339,11 +340,13 @@ fun InvoiceCaptureScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    "Recent Receipts",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
+                Column {
+                    Text(
+                        "Recent Receipts",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
                 
                 if (hasCameraPermission) {
                     FloatingActionButton(
@@ -356,23 +359,14 @@ fun InvoiceCaptureScreen(
                 }
             }
             
-            LazyColumn(
+            // New Educational Spreadsheet Table
+            ReceiptSpreadsheetTable(
+                receipts = receipts,
+                onDeleteReceipt = { receiptId -> viewModel.deleteReceipt(receiptId) },
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(receipts) { receipt ->
-                    ReceiptCard(
-                        receipt = receipt,
-                        onDelete = { viewModel.deleteReceipt(receipt.id) }
-                    )
-                }
-                
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
+                    .padding(horizontal = 16.dp)
+            )
         }
     }
 }

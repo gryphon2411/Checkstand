@@ -2,6 +2,7 @@ package com.checkstand.data.repository
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import com.checkstand.domain.model.Receipt
 import com.checkstand.domain.model.ExpenseCategory
@@ -49,24 +50,24 @@ class MediaPipeReceiptRepository(
         }
     }
 
-    override fun analyzeReceiptText(rawText: String): Flow<Receipt> {
-        Log.d(TAG, "Analyzing receipt text: ${rawText.take(100)}...")
+    override fun processReceiptText(text: String): Flow<Receipt> {
+        Log.d(TAG, "Processing receipt text: ${text.take(100)}...")
 
         return flow {
-            val prompt = buildReceiptAnalysisPrompt(rawText)
+            val prompt = buildReceiptAnalysisPrompt(text)
             Log.d(TAG, "Sending prompt to LLM: ${prompt.take(200)}...")
 
             llmService.generateResponse(prompt).collect { response ->
                 Log.d(TAG, "LLM response received: ${response.take(200)}...")
                 try {
-                    val receipt = parseReceiptFromResponse(response, rawText)
+                    val receipt = parseReceiptFromResponse(response, text)
                     Log.d(TAG, "Successfully parsed receipt: ${receipt.merchantName}, total: ${receipt.totalAmount}")
                     emit(receipt)
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to parse receipt from response", e)
                     Log.e(TAG, "Full LLM response: $response")
                     // Try to extract some basic info even if parsing fails
-                    val fallbackReceipt = createFallbackReceipt(rawText, response)
+                    val fallbackReceipt = createFallbackReceipt(text, response)
                     Log.d(TAG, "Created fallback receipt with total: ${fallbackReceipt.totalAmount}")
                     emit(fallbackReceipt)
                 }
@@ -74,21 +75,21 @@ class MediaPipeReceiptRepository(
         }
     }
 
-    override fun analyzeReceiptImage(image: Bitmap): Flow<Receipt> {
-        Log.d(TAG, "Analyzing receipt image by extracting text first...")
+    override fun processReceiptImage(bitmap: Bitmap): Flow<Receipt> {
+        Log.d(TAG, "Processing receipt image by extracting text first...")
 
         return flow {
             try {
                 Log.d(TAG, "Starting OCR text extraction from image...")
-                val rawText = ocrService.extractTextFromImage(image)
+                val rawText = ocrService.extractTextFromImage(bitmap)
                 Log.d(TAG, "OCR extraction complete. Text length: ${rawText.length}")
                 Log.d(TAG, "OCR extracted text preview: ${rawText.take(200)}...")
                 
                 if (rawText.isNotBlank()) {
-                    // Now that we have the text, delegate to the text analysis function
-                    analyzeReceiptText(rawText).collect { receipt ->
+                    // Now that we have the text, delegate to the text processing function
+                    processReceiptText(rawText).collect { receipt ->
                         // We can enhance the receipt with the image info if needed
-                        // For now, just emit the analyzed receipt
+                        // For now, just emit the processed receipt
                         emit(receipt)
                     }
                 } else {
@@ -96,7 +97,34 @@ class MediaPipeReceiptRepository(
                     emit(createFallbackReceipt("Could not extract text from image.", "No OCR text available"))
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to analyze receipt image", e)
+                Log.e(TAG, "Failed to process receipt image", e)
+                emit(createFallbackReceipt("Error processing receipt image.", "Error: ${e.message}"))
+            }
+        }
+    }
+
+    override fun processReceiptImage(imageUri: Uri): Flow<Receipt> {
+        Log.d(TAG, "Processing receipt image from URI...")
+
+        return flow {
+            try {
+                Log.d(TAG, "Starting OCR text extraction from image URI...")
+                val rawText = ocrService.extractTextFromImage(imageUri)
+                Log.d(TAG, "OCR extraction complete. Text length: ${rawText.length}")
+                Log.d(TAG, "OCR extracted text preview: ${rawText.take(200)}...")
+                
+                if (rawText.isNotBlank()) {
+                    // Now that we have the text, delegate to the text processing function
+                    processReceiptText(rawText).collect { receipt ->
+                        // Emit the processed receipt
+                        emit(receipt)
+                    }
+                } else {
+                    Log.w(TAG, "OCR service returned empty text from image URI.")
+                    emit(createFallbackReceipt("Could not extract text from image.", "No OCR text available"))
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to process receipt image from URI", e)
                 emit(createFallbackReceipt("Error processing receipt image.", "Error: ${e.message}"))
             }
         }
@@ -372,7 +400,16 @@ class MediaPipeReceiptRepository(
         }
     }
 
-    override suspend fun downloadModel(onProgress: (Int) -> Unit): Boolean {
+    override fun getModelInfo(): ModelInfo {
+        return ModelInfo(
+            name = MODEL_NAME,
+            version = MODEL_VERSION,
+            isReady = llmService.isModelReady()
+        )
+    }
+
+    // Additional methods not in interface but used internally
+    suspend fun downloadModel(onProgress: (Int) -> Unit): Boolean {
         Log.d(TAG, "Starting model download...")
         return try {
             llmService.getModelManager().downloadModel(onProgress)
@@ -382,21 +419,7 @@ class MediaPipeReceiptRepository(
         }
     }
 
-    override fun getModelInfo(): ModelInfo {
-        val modelManager = llmService.getModelManager()
-        val modelFile = if (modelManager.isModelAvailable()) {
-            modelManager.getModelFile()
-        } else null
-        
-        return ModelInfo(
-            name = MODEL_NAME,
-            size = modelFile?.length() ?: 0L,
-            path = modelFile?.absolutePath ?: "Not available",
-            isLoaded = llmService.isModelReady()
-        )
-    }
-
-    override fun cleanup() {
+    fun cleanup() {
         Log.d(TAG, "Cleaning up receipt repository resources...")
         llmService.cleanup()
     }
