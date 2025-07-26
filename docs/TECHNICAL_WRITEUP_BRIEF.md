@@ -130,7 +130,7 @@ Checkstand demonstrates Gemma 3n's potential beyond simple conversations:
 ## 6. Technical Implementation Details
 
 ### 6.1 Core Technologies
-- **Gemma 3n**: 3.1GB E2B model via MediaPipe framework
+- **Gemma 3n**: 4.4GB E4B model via MediaPipe framework
 - **Google ML Kit**: OCR text recognition
 - **Android Architecture**: Clean Architecture with Hilt DI
 - **UI Framework**: Jetpack Compose with Material 3 design

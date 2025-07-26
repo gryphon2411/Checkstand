@@ -86,7 +86,7 @@ The heart of Checkstand's innovation lies in its sophisticated multimodal proces
 - Extracts raw text with confidence scoring
 
 **Phase 3: Language Model Analysis**
-- Gemma 3n (3.1GB E2B model) via MediaPipe framework
+- Gemma 3n (4.4GB E4B model) via MediaPipe framework
 - Structured prompt engineering for consistent output
 - Context-aware analysis of extracted receipt text
 
@@ -139,7 +139,7 @@ private fun createFallbackReceipt(extractedText: String, originalResponse: Strin
 
 ### Challenge 1: Model Performance on Mobile Devices
 
-**Problem**: Gemma 3n (3.1GB) is computationally intensive for mobile hardware.
+**Problem**: Gemma 3n (4.4GB) is computationally intensive for mobile hardware.
 
 **Solution**: 
 - Optimized model loading with progress indicators

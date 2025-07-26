@@ -76,7 +76,7 @@ val receipt = parseReceiptFromResponse(llmResponse)
 
 ### Model Loading
 - **Time**: 1-2 seconds on modern Android devices
-- **Memory**: ~3.1GB for Gemma 3n E2B model
+- **Memory**: ~4.4GB for Gemma 3n E4B model
 - **Optimization**: Lazy loading with progress indicators
 
 ### Receipt Processing
