@@ -14,6 +14,8 @@ import com.checkstand.service.OCRService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.TimeoutCancellationException
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,6 +32,7 @@ class MediaPipeReceiptRepository(
         private const val TAG = "MediaPipeReceiptRepo"
         private const val MODEL_NAME = "Gemma-3n E4B"
         private const val MODEL_VERSION = "int4"
+        private const val PROCESSING_TIMEOUT_MS = 60_000L // 60 seconds timeout
     }
 
     override fun isModelAvailable(): Boolean {
@@ -51,39 +54,42 @@ class MediaPipeReceiptRepository(
     }
 
     override fun processReceiptText(text: String): Flow<Receipt> {
-        Log.d(TAG, "Processing receipt text: ${text.take(100)}...")
-
         return flow {
             val prompt = buildReceiptAnalysisPrompt(text)
-            Log.d(TAG, "Sending prompt to LLM: ${prompt.take(200)}...")
 
-            llmService.generateResponse(prompt).collect { response ->
-                Log.d(TAG, "LLM response received: ${response.take(200)}...")
-                try {
-                    val receipt = parseReceiptFromResponse(response, text)
-                    Log.d(TAG, "Successfully parsed receipt: ${receipt.merchantName}, total: ${receipt.totalAmount}")
-                    emit(receipt)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to parse receipt from response", e)
-                    Log.e(TAG, "Full LLM response: $response")
-                    // Try to extract some basic info even if parsing fails
-                    val fallbackReceipt = createFallbackReceipt(text, response)
-                    Log.d(TAG, "Created fallback receipt with total: ${fallbackReceipt.totalAmount}")
-                    emit(fallbackReceipt)
+            try {
+                // Add timeout to prevent infinite processing
+                withTimeout(PROCESSING_TIMEOUT_MS) {
+                    llmService.generateResponse(prompt).collect { response ->
+                        try {
+                            val receipt = parseReceiptFromResponse(response, text)
+                            emit(receipt)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Failed to parse receipt from response", e)
+                            // Try to extract some basic info even if parsing fails
+                            val fallbackReceipt = createFallbackReceipt(text, response)
+                            emit(fallbackReceipt)
+                        }
+                    }
                 }
+            } catch (e: TimeoutCancellationException) {
+                Log.w(TAG, "LLM processing timed out after ${PROCESSING_TIMEOUT_MS}ms")
+                // Create fallback receipt when timeout occurs
+                val fallbackReceipt = createFallbackReceipt(text, "Processing timed out")
+                emit(fallbackReceipt)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error during LLM processing", e)
+                // Create fallback receipt for any other errors
+                val fallbackReceipt = createFallbackReceipt(text, "Error: ${e.message}")
+                emit(fallbackReceipt)
             }
         }
     }
 
     override fun processReceiptImage(bitmap: Bitmap): Flow<Receipt> {
-        Log.d(TAG, "Processing receipt image by extracting text first...")
-
         return flow {
             try {
-                Log.d(TAG, "Starting OCR text extraction from image...")
                 val rawText = ocrService.extractTextFromImage(bitmap)
-                Log.d(TAG, "OCR extraction complete. Text length: ${rawText.length}")
-                Log.d(TAG, "OCR extracted text preview: ${rawText.take(200)}...")
                 
                 if (rawText.isNotBlank()) {
                     // Now that we have the text, delegate to the text processing function
@@ -104,14 +110,9 @@ class MediaPipeReceiptRepository(
     }
 
     override fun processReceiptImage(imageUri: Uri): Flow<Receipt> {
-        Log.d(TAG, "Processing receipt image from URI...")
-
         return flow {
             try {
-                Log.d(TAG, "Starting OCR text extraction from image URI...")
                 val rawText = ocrService.extractTextFromImage(imageUri)
-                Log.d(TAG, "OCR extraction complete. Text length: ${rawText.length}")
-                Log.d(TAG, "OCR extracted text preview: ${rawText.take(200)}...")
                 
                 if (rawText.isNotBlank()) {
                     // Now that we have the text, delegate to the text processing function

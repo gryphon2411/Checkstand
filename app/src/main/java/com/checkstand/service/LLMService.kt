@@ -11,6 +11,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.yield
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class LLMService @Inject constructor(
@@ -21,11 +26,13 @@ class LLMService @Inject constructor(
     private var llmInference: LlmInference? = null
     private var isModelLoaded = false
     private val modelManager = ModelManager(context)
+    private val executor = Executors.newSingleThreadExecutor() // For cancellable inference
     
     companion object {
         private const val TAG = "LLMService"
         private const val MAX_IMAGE_COUNT = 5
         private const val MAX_TOKENS = 1024
+        private const val INFERENCE_TIMEOUT_SECONDS = 45L // Timeout for native inference calls
     }
     
     suspend fun initializeModel(): Boolean {
@@ -117,23 +124,41 @@ class LLMService @Inject constructor(
             emit("Error: Model not loaded")
             return@flow
         }
-        
+
         try {
-            Log.d(TAG, "Generating response for prompt: ${prompt.take(50)}...")
+            // Submit the blocking native call to a separate thread with timeout
+            val future: Future<String> = executor.submit<String> {
+                try {
+                    // Create a fresh session for each request to avoid context contamination
+                    val sessionOptions = LlmInferenceSession.LlmInferenceSessionOptions.builder()
+                        .setTopK(40)
+                        .setTopP(0.95f)
+                        .setTemperature(0.8f)
+                        .build()
+                        
+                    LlmInferenceSession.createFromOptions(llmInference!!, sessionOptions).use { session ->
+                        session.addQueryChunk(prompt)
+                        val response = session.generateResponse()
+                        response
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error in native inference call", e)
+                    "Error: ${e.message}"
+                }
+            }
             
-            // Create a fresh session for each request to avoid context contamination
-            val sessionOptions = LlmInferenceSession.LlmInferenceSessionOptions.builder()
-                .setTopK(40)
-                .setTopP(0.95f)
-                .setTemperature(0.8f)
-                .build()
-                
-            LlmInferenceSession.createFromOptions(llmInference!!, sessionOptions).use { session ->
-                Log.d(TAG, "Created fresh session for receipt processing")
-                session.addQueryChunk(prompt)
-                val response = session.generateResponse()
-                Log.d(TAG, "Generated response: ${response.take(100)}...")
+            // Wait for the result with timeout
+            try {
+                val response = future.get(INFERENCE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 emit(response)
+            } catch (e: java.util.concurrent.TimeoutException) {
+                Log.w(TAG, "LLM inference timed out after ${INFERENCE_TIMEOUT_SECONDS} seconds")
+                future.cancel(true) // Attempt to interrupt the thread
+                emit("Error: Processing timed out")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error waiting for inference result", e)
+                future.cancel(true)
+                emit("Error: ${e.message}")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error generating response", e)
@@ -182,6 +207,15 @@ class LLMService @Inject constructor(
     fun getModelManager(): ModelManager = modelManager
     
     fun cleanup() {
+        try {
+            executor.shutdown()
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow()
+            }
+        } catch (e: InterruptedException) {
+            executor.shutdownNow()
+        }
+        
         llmInference?.close()
         llmInference = null
         isModelLoaded = false

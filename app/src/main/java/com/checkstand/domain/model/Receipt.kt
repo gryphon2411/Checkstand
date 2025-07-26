@@ -13,5 +13,8 @@ data class Receipt(
     val category: ExpenseCategory = ExpenseCategory.UNCATEGORIZED,
     val rawText: String = "",
     val llmResponse: String = "",
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val status: ReceiptStatus? = ReceiptStatus.COMPLETED,
+    val processingError: String? = null,
+    val retryCount: Int = 0
 )

@@ -13,9 +13,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
@@ -27,12 +29,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.checkstand.R
 import com.checkstand.domain.model.Receipt
+import com.checkstand.domain.model.ReceiptStatus
 import com.checkstand.service.CameraService
 import com.checkstand.service.ModelStatus
 import com.checkstand.ui.components.ReceiptSpreadsheetTable
@@ -55,6 +60,10 @@ fun InvoiceCaptureScreen(
     val modelStatus by viewModel.modelStatus.collectAsStateWithLifecycle()
     val loadingProgress by viewModel.loadingProgress.collectAsStateWithLifecycle()
     val statusMessage by viewModel.statusMessage.collectAsStateWithLifecycle()
+    
+    // Queue processing states
+    val isQueueProcessing by viewModel.isQueueProcessing.collectAsStateWithLifecycle()
+    val currentProcessingId by viewModel.currentProcessingId.collectAsStateWithLifecycle()
     
     var hasCameraPermission by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
@@ -112,7 +121,7 @@ fun InvoiceCaptureScreen(
                 label = { 
                     Text(
                         when {
-                            uiState.isProcessing -> "Gemma 3n"
+                            isQueueProcessing -> "Gemma 3n"
                             modelStatus == ModelStatus.READY -> "Gemma 3n"
                             modelStatus == ModelStatus.LOADING -> "Loading Gemma 3n"
                             modelStatus == ModelStatus.ERROR -> "Model Error"
@@ -123,7 +132,7 @@ fun InvoiceCaptureScreen(
                 },
                 leadingIcon = {
                     when {
-                        uiState.isProcessing -> CircularProgressIndicator(
+                        isQueueProcessing -> CircularProgressIndicator(
                             modifier = Modifier.size(16.dp)
                         )
                         modelStatus == ModelStatus.READY -> Icon(
@@ -148,7 +157,7 @@ fun InvoiceCaptureScreen(
                 },
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = when {
-                        uiState.isProcessing -> MaterialTheme.colorScheme.secondaryContainer
+                        isQueueProcessing -> MaterialTheme.colorScheme.secondaryContainer
                         modelStatus == ModelStatus.READY -> MaterialTheme.colorScheme.primaryContainer
                         modelStatus == ModelStatus.LOADING -> MaterialTheme.colorScheme.secondaryContainer
                         modelStatus == ModelStatus.ERROR -> MaterialTheme.colorScheme.errorContainer
@@ -198,26 +207,27 @@ fun InvoiceCaptureScreen(
                 // Gallery button with universally supported emoji
                 FloatingActionButton(
                     onClick = { 
-                        if (modelStatus == ModelStatus.READY && !uiState.isProcessing) {
+                        if (modelStatus == ModelStatus.READY) {
                             galleryLauncher.launch("image/*")
                         }
                     },
                     modifier = Modifier.size(56.dp),
-                    containerColor = if (modelStatus == ModelStatus.READY && !uiState.isProcessing) 
+                    containerColor = if (modelStatus == ModelStatus.READY) 
                         MaterialTheme.colorScheme.primary 
                     else 
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 ) {
-                    Text(
-                        "📁", 
-                        fontSize = MaterialTheme.typography.headlineSmall.fontSize
+                    Icon(
+                        Icons.Default.Image,
+                        contentDescription = "Gallery",
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
                 
                 // Capture button
                 FloatingActionButton(
                     onClick = {
-                        if (modelStatus == ModelStatus.READY && !uiState.isProcessing) {
+                        if (modelStatus == ModelStatus.READY) {
                             cameraService.capturePhoto(
                                 onImageCaptured = { uri -> 
                                     val bitmap = ImageUtils.uriToBitmap(context, uri, rotateForPortrait = true)
@@ -230,15 +240,17 @@ fun InvoiceCaptureScreen(
                         }
                     },
                     modifier = Modifier.size(72.dp),
-                    containerColor = if (modelStatus == ModelStatus.READY && !uiState.isProcessing) 
+                    containerColor = if (modelStatus == ModelStatus.READY) 
                         MaterialTheme.colorScheme.primary 
                     else 
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                     shape = CircleShape
                 ) {
-                    Text(
-                        "📸", 
-                        fontSize = MaterialTheme.typography.headlineMedium.fontSize
+                    Icon(
+                        Icons.Default.Camera,
+                        contentDescription = "Capture Photo",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(32.dp)
                     )
                 }
                 
@@ -257,40 +269,42 @@ fun InvoiceCaptureScreen(
             }
         }
         
-        // Compact success message for processed receipt
+        // Compact success message for processed receipt (only show completed receipts)
         uiState.lastProcessedReceipt?.let { receipt ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                AssistChip(
-                    onClick = { viewModel.clearLastProcessedReceipt() },
-                    label = { 
-                        Text("${receipt.merchantName} • $${receipt.totalAmount}")
-                    },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+            if (receipt.status == ReceiptStatus.COMPLETED && receipt.merchantName != "Processing...") {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    AssistChip(
+                        onClick = { viewModel.clearLastProcessedReceipt() },
+                        label = { 
+                            Text("${receipt.merchantName} • $${receipt.totalAmount}")
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Dismiss",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            leadingIconContentColor = MaterialTheme.colorScheme.primary,
+                            trailingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                    },
-                    trailingIcon = {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = "Dismiss",
-                            modifier = Modifier.size(16.dp)
-                        )
-                    },
-                    colors = AssistChipDefaults.assistChipColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        leadingIconContentColor = MaterialTheme.colorScheme.primary,
-                        trailingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                )
+                }
             }
         }
 
@@ -354,7 +368,11 @@ fun InvoiceCaptureScreen(
                         modifier = Modifier.size(56.dp),
                         containerColor = MaterialTheme.colorScheme.primary
                     ) {
-                        Text("📸")
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = "Camera",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 }
             }

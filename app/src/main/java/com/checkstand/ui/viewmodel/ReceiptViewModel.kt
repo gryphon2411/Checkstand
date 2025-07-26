@@ -9,6 +9,7 @@ import com.checkstand.domain.repository.ReceiptRepository
 import com.checkstand.domain.usecase.ProcessReceiptUseCase
 import com.checkstand.domain.usecase.CategorizeExpenseUseCase
 import com.checkstand.data.repository.ReceiptDataRepository
+import com.checkstand.data.queue.ReceiptProcessingQueue
 import com.checkstand.service.ModelStatusService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,8 @@ class ReceiptViewModel @Inject constructor(
     private val categorizeExpenseUseCase: CategorizeExpenseUseCase,
     private val modelStatusService: ModelStatusService,
     private val receiptRepository: ReceiptRepository,
-    private val receiptDataRepository: ReceiptDataRepository
+    private val receiptDataRepository: ReceiptDataRepository,
+    private val receiptProcessingQueue: ReceiptProcessingQueue
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReceiptUiState())
@@ -44,6 +46,10 @@ class ReceiptViewModel @Inject constructor(
     val loadingProgress = modelStatusService.loadingProgress
     val statusMessage = modelStatusService.statusMessage
     
+    // Expose queue processing status
+    val isQueueProcessing = receiptProcessingQueue.isProcessing
+    val currentProcessingId = receiptProcessingQueue.currentProcessingId
+    
     init {
         // Initialize the model when ViewModel is created
         initializeModel()
@@ -61,29 +67,17 @@ class ReceiptViewModel @Inject constructor(
 
     fun processReceiptImage(bitmap: Bitmap) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                isProcessing = true,
-                currentImageUri = null
-            )
-
-            processReceiptUseCase(bitmap).collect { result ->
-                result.fold(
-                    onSuccess = { receipt ->
-                        // Save to database
-                        receiptDataRepository.insertReceipt(receipt)
-                        _uiState.value = _uiState.value.copy(
-                            isProcessing = false,
-                            currentImageUri = null,
-                            lastProcessedReceipt = receipt
-                        )
-                    },
-                    onFailure = { error ->
-                        _uiState.value = _uiState.value.copy(
-                            isProcessing = false,
-                            currentImageUri = null,
-                            errorMessage = error.message
-                        )
-                    }
+            try {
+                // Add to queue - returns immediately with placeholder receipt
+                val placeholderReceipt = receiptProcessingQueue.addImageToQueue(bitmap)
+                
+                _uiState.value = _uiState.value.copy(
+                    lastProcessedReceipt = placeholderReceipt,
+                    errorMessage = null
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "Failed to add receipt to processing queue: ${e.message}"
                 )
             }
         }
@@ -91,29 +85,19 @@ class ReceiptViewModel @Inject constructor(
 
     fun processReceiptImage(imageUri: Uri) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                isProcessing = true,
-                currentImageUri = imageUri
-            )
-
-            processReceiptUseCase(imageUri).collect { result ->
-                result.fold(
-                    onSuccess = { receipt ->
-                        // Save to database
-                        receiptDataRepository.insertReceipt(receipt)
-                        _uiState.value = _uiState.value.copy(
-                            isProcessing = false,
-                            currentImageUri = null,
-                            lastProcessedReceipt = receipt
-                        )
-                    },
-                    onFailure = { error ->
-                        _uiState.value = _uiState.value.copy(
-                            isProcessing = false,
-                            currentImageUri = null,
-                            errorMessage = error.message
-                        )
-                    }
+            try {
+                // Add to queue - returns immediately with placeholder receipt
+                val placeholderReceipt = receiptProcessingQueue.addImageUriToQueue(imageUri)
+                
+                _uiState.value = _uiState.value.copy(
+                    currentImageUri = null,
+                    lastProcessedReceipt = placeholderReceipt,
+                    errorMessage = null
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    currentImageUri = null,
+                    errorMessage = "Failed to add receipt to processing queue: ${e.message}"
                 )
             }
         }
@@ -121,24 +105,17 @@ class ReceiptViewModel @Inject constructor(
 
     fun processReceiptText(text: String) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isProcessing = true)
-
-            processReceiptUseCase(text).collect { result ->
-                result.fold(
-                    onSuccess = { receipt ->
-                        // Save to database
-                        receiptDataRepository.insertReceipt(receipt)
-                        _uiState.value = _uiState.value.copy(
-                            isProcessing = false,
-                            lastProcessedReceipt = receipt
-                        )
-                    },
-                    onFailure = { error ->
-                        _uiState.value = _uiState.value.copy(
-                            isProcessing = false,
-                            errorMessage = error.message
-                        )
-                    }
+            try {
+                // Add to queue - returns immediately with placeholder receipt
+                val placeholderReceipt = receiptProcessingQueue.addTextToQueue(text)
+                
+                _uiState.value = _uiState.value.copy(
+                    lastProcessedReceipt = placeholderReceipt,
+                    errorMessage = null
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "Failed to add receipt to processing queue: ${e.message}"
                 )
             }
         }
@@ -168,6 +145,16 @@ class ReceiptViewModel @Inject constructor(
         }
     }
 
+    fun getQueueSize(): Int {
+        return receiptProcessingQueue.getQueueSize()
+    }
+
+    fun clearQueue() {
+        viewModelScope.launch {
+            receiptProcessingQueue.clearQueue()
+        }
+    }
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
     }
@@ -178,7 +165,6 @@ class ReceiptViewModel @Inject constructor(
 }
 
 data class ReceiptUiState(
-    val isProcessing: Boolean = false,
     val currentImageUri: Uri? = null,
     val lastProcessedReceipt: Receipt? = null,
     val errorMessage: String? = null

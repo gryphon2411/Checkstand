@@ -16,6 +16,9 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.checkstand.domain.model.Receipt
+import com.checkstand.domain.model.ReceiptStatus
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
@@ -218,7 +222,7 @@ private fun SpreadsheetHeader(
         // Date Column
         SpreadsheetHeaderCell(
             text = "Date",
-            weight = 0.3f,
+            weight = 0.25f,
             sortColumn = SortColumn.DATE,
             currentSort = sortColumn,
             sortDirection = sortDirection,
@@ -228,7 +232,7 @@ private fun SpreadsheetHeader(
         // Merchant Column
         SpreadsheetHeaderCell(
             text = "Merchant",
-            weight = 0.4f,
+            weight = 0.35f,
             sortColumn = SortColumn.MERCHANT,
             currentSort = sortColumn,
             sortDirection = sortDirection,
@@ -238,22 +242,27 @@ private fun SpreadsheetHeader(
         // Amount Column
         SpreadsheetHeaderCell(
             text = "Amount",
-            weight = 0.25f,
+            weight = 0.2f,
             sortColumn = SortColumn.AMOUNT,
             currentSort = sortColumn,
             sortDirection = sortDirection,
             onClick = { onSortChanged(SortColumn.AMOUNT) }
         )
         
+        // Status Column
+        Box(
+            modifier = Modifier.weight(0.15f),
+            contentAlignment = Alignment.Center
+        ) {
+            // Empty - just visual indicators in rows
+        }
+        
         // Actions Column
         Box(
             modifier = Modifier.weight(0.05f),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                "⚙️",
-                fontSize = 12.sp
-            )
+            // Empty - just action buttons in rows
         }
     }
 }
@@ -316,7 +325,7 @@ private fun SpreadsheetRow(
         // Date
         Text(
             text = dateFormatter.format(receipt.date),
-            modifier = Modifier.weight(0.3f),
+            modifier = Modifier.weight(0.25f),
             style = MaterialTheme.typography.bodySmall,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -325,7 +334,7 @@ private fun SpreadsheetRow(
         // Merchant
         Text(
             text = receipt.merchantName,
-            modifier = Modifier.weight(0.4f),
+            modifier = Modifier.weight(0.35f),
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
             maxLines = 1,
@@ -334,13 +343,60 @@ private fun SpreadsheetRow(
         
         // Amount
         Text(
-            text = "$${receipt.totalAmount}",
-            modifier = Modifier.weight(0.25f),
+            text = when (receipt.status) {
+                ReceiptStatus.PENDING, ReceiptStatus.PROCESSING -> "---"
+                else -> "$${receipt.totalAmount}"
+            },
+            modifier = Modifier.weight(0.2f),
             style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
+            fontWeight = if (receipt.status == ReceiptStatus.PENDING || receipt.status == ReceiptStatus.PROCESSING) FontWeight.Normal else FontWeight.Bold,
+            color = if (receipt.status == ReceiptStatus.PENDING || receipt.status == ReceiptStatus.PROCESSING) 
+                MaterialTheme.colorScheme.onSurfaceVariant 
+            else 
+                MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.End
         )
+        
+        // Status Indicator
+        Box(
+            modifier = Modifier
+                .weight(0.15f)
+                .padding(horizontal = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            when (receipt.status ?: ReceiptStatus.COMPLETED) {
+                ReceiptStatus.PENDING -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                ReceiptStatus.PROCESSING -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                ReceiptStatus.COMPLETED -> {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Completed",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                ReceiptStatus.FAILED -> {
+                    Icon(
+                        imageVector = Icons.Default.Warning,
+                        contentDescription = "Failed",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
         
         // Delete Action
         IconButton(

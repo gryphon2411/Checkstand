@@ -11,6 +11,8 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.TimeoutCancellationException
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -22,6 +24,7 @@ class OCRService @Inject constructor(
 ) {
     companion object {
         private const val TAG = "OCRService"
+        private const val OCR_TIMEOUT_MS = 30_000L // 30 seconds timeout for OCR
     }
 
     private val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
@@ -30,9 +33,13 @@ class OCRService @Inject constructor(
         return withContext(Dispatchers.IO) {
             try {
                 val image = InputImage.fromFilePath(context, imageUri)
-                val result = textRecognizer.process(image).await()
-                Log.d(TAG, "OCR extracted text: ${result.text.take(100)}...")
+                val result = withTimeout(OCR_TIMEOUT_MS) {
+                    textRecognizer.process(image).await()
+                }
                 result.text
+            } catch (e: TimeoutCancellationException) {
+                Log.w(TAG, "OCR extraction from URI timed out after ${OCR_TIMEOUT_MS}ms")
+                ""
             } catch (e: Exception) {
                 Log.e(TAG, "Error extracting text from image URI", e)
                 ""
@@ -44,9 +51,13 @@ class OCRService @Inject constructor(
         return withContext(Dispatchers.IO) {
             try {
                 val image = InputImage.fromBitmap(bitmap, 0)
-                val result = textRecognizer.process(image).await()
-                Log.d(TAG, "OCR extracted text from bitmap: ${result.text.take(100)}...")
+                val result = withTimeout(OCR_TIMEOUT_MS) {
+                    textRecognizer.process(image).await()
+                }
                 result.text
+            } catch (e: TimeoutCancellationException) {
+                Log.w(TAG, "OCR extraction from bitmap timed out after ${OCR_TIMEOUT_MS}ms")
+                ""
             } catch (e: Exception) {
                 Log.e(TAG, "Error extracting text from bitmap", e)
                 ""
