@@ -148,34 +148,36 @@ class MediaPipeReceiptRepository(
 
     private fun buildReceiptAnalysisPrompt(rawText: String): String {
         return """
-            Analyze this receipt text and extract structured information. Return the data in this exact format:
-            
+            Analyze this receipt or invoice text and extract the key information. Focus on identifying the actual business or merchant name clearly.
+
+            For merchant identification: Look for the business name (often near the top), company names, store names, or recognizable brands. Use the specific business name rather than generic terms.
+
+            Return the data in this exact format:
+
             MERCHANT: [merchant name]
             DATE: [date in yyyy-MM-dd format]
             TOTAL: [total amount as decimal number]
-            ITEMS:
-            - [item name] | [quantity] | [unit price] | [total price]
-            - [item name] | [quantity] | [unit price] | [total price]
-            
+
             Receipt text:
             $rawText
-            
-            Please extract the information accurately. If any field is unclear, use reasonable defaults.
+
+            Extract the information accurately. If any field is unclear, use reasonable defaults.
         """.trimIndent()
     }
     
     private fun buildReceiptImageAnalysisPrompt(): String {
         return """
-            Analyze this receipt image and extract structured information. Return the data in this exact format:
-            
+            Analyze this receipt image and extract the key information. Focus on identifying the actual business or merchant name clearly.
+
+            For merchant identification: Look for the business name (often near the top), company names, store names, or recognizable brands. Use the specific business name rather than generic terms.
+
+            Return the data in this exact format:
+
             MERCHANT: [merchant name]
             DATE: [date in yyyy-MM-dd format]
             TOTAL: [total amount as decimal number]
-            ITEMS:
-            - [item name] | [quantity] | [unit price] | [total price]
-            - [item name] | [quantity] | [unit price] | [total price]
-            
-            Please look at the receipt image and extract all visible information accurately. If any field is unclear from the image, use reasonable defaults.
+
+            Look at the receipt image and extract all visible information accurately. If any field is unclear from the image, use reasonable defaults.
         """.trimIndent()
     }
 
