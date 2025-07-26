@@ -13,11 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
@@ -218,7 +216,7 @@ fun InvoiceCaptureScreen(
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 ) {
                     Icon(
-                        Icons.Default.Image,
+                        painter = painterResource(id = R.drawable.photo_24px),
                         contentDescription = "Gallery",
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
@@ -247,7 +245,7 @@ fun InvoiceCaptureScreen(
                     shape = CircleShape
                 ) {
                     Icon(
-                        Icons.Default.Camera,
+                        painter = painterResource(id = R.drawable.scan_24px),
                         contentDescription = "Capture Photo",
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(32.dp)
@@ -369,7 +367,7 @@ fun InvoiceCaptureScreen(
                         containerColor = MaterialTheme.colorScheme.primary
                     ) {
                         Icon(
-                            Icons.Default.CheckCircle,
+                            painter = painterResource(id = R.drawable.scan_24px),
                             contentDescription = "Camera",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
