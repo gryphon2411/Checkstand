@@ -35,33 +35,33 @@ Checkstand delivers **financial empowerment through trustworthy, on-device AI** 
 ### 2.1 Clean Architecture Implementation
 
 ```mermaid
-graph TD
-    subgraph "Presentation Layer"
+flowchart TD
+    subgraph presentation ["Presentation Layer"]
         A[InvoiceCaptureScreen]
         B[CameraService] 
         C[ModelStatusService]
     end
     
-    subgraph "Domain Layer"
+    subgraph domain ["Domain Layer"]
         D[ProcessReceiptUseCase]
         E[Receipt Model]
         F[Repository Interfaces]
     end
     
-    subgraph "Data Layer"
+    subgraph data ["Data Layer"]
         G[MediaPipeLLMRepo]
         H["LLMService<br/>(Gemma 3n 4.4GB E4B)"]
         I["OCRService<br/>(Google ML Kit)"]
         J[Local Database]
     end
     
-    A <--> D
-    D <--> F
-    F <--> G
+    %% Clean Architecture Dependencies (Subgraph to Subgraph)
+    presentation --> domain
+    domain --> data
     
-    classDef presentation fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
-    classDef domain fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef data fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef presentation fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#000
+    classDef domain fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef data fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
     
     class A,B,C presentation
     class D,E,F domain
