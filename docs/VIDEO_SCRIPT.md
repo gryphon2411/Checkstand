@@ -1,6 +1,6 @@
 # Checkstand Video Demo Script
 **Google Gemma 3n Impact Challenge Submission**
-*Duration: 2:25*
+*Script Duration: 2:25 (Final video: 3:17 - slowed for better pacing)*
 
 ---
 

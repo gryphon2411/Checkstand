@@ -22,7 +22,7 @@
 | Technical Writeup | **COMPLETE** ✨ | August 1, 2025 |
 | Public Code Repository | **COMPLETE** ✨ | July 30, 2025 |
 | Functional Application | **COMPLETE** ✨ | August 2, 2025 |
-| Video Demo (2:25 min) | **COMPLETE** ✨ | August 2, 2025 |
+| Video Demo (3:17 min) | **COMPLETE** ✨ | August 2, 2025 |
 | **Kaggle Submission** | **COMPLETE** ✨ | August 2, 2025 |
 
 **🎉 Result**: **100% submission completion** with early delivery!
@@ -39,7 +39,7 @@
 - ✅ **Device tested** - verified working on physical Android hardware
 
 ### **🎬 Video Demonstration**
-- ✅ **Professional quality** 2:25 minute demo video
+- ✅ **Professional quality** 3:17 minute demo video
 - ✅ **Compelling narrative** addressing real financial pain points
 - ✅ **Live technical demo** showing receipt scanning and AI processing
 - ✅ **Production ready** with clear audio and engaging storytelling
@@ -75,7 +75,7 @@
 ### **Submission Date**: August 2, 2025 (4 days before deadline)
 ### **Submission Package**:
 - [x] **Kaggle Writeup**: Comprehensive project description with all links
-- [x] **Video Demo**: 2:25 minute professional demonstration
+- [x] **Video Demo**: 3:17 minute professional demonstration
 - [x] **Technical Documentation**: GitHub repository with detailed writeup
 - [x] **Source Code**: Complete Android application codebase
 - [x] **All Requirements Met**: 100% compliance with competition criteria
