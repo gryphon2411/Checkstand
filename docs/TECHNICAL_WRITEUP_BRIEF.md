@@ -101,6 +101,11 @@ flowchart TD
 - **Local Storage**: SQLite database with app-specific access
 - **No Analytics**: No telemetry or usage tracking
 
+### 3.3 Known Limitations
+- **Multilingual Support**: Non-English receipts may have reduced merchant name recognition accuracy
+- **Model Training Scope**: Gemma 3n's English-focused training data affects international receipt processing
+- **Future Enhancement**: Planned multilingual prompt engineering and language detection preprocessing
+
 ---
 
 ## 4. Real-World Impact
