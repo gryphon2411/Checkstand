@@ -185,3 +185,10 @@ Checkstand showcases the transformative potential of on-device AI through:
 **Competition Alignment**: Perfect embodiment of "thinking bigger than chatbot" with practical Gemma 3n implementation
 
 This submission demonstrates how Google AI Edge can power sophisticated applications while preserving user privacy and enabling offline functionality - representing the future of trustworthy AI.
+
+---
+
+## 📖 **Additional Technical Resources**
+
+For judges seeking deeper technical implementation details:
+- **[Complete Technical Writeup](https://github.com/gryphon2411/Checkstand/blob/master/docs/TECHNICAL_WRITEUP.md)**: Comprehensive implementation guide with code examples, performance benchmarks, development journey, and detailed architecture analysis
