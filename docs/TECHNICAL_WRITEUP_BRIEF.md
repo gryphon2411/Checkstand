@@ -35,10 +35,10 @@ Checkstand delivers **financial empowerment through trustworthy, on-device AI** 
 ### 2.1 Clean Architecture Implementation
 
 ```mermaid
-graph TB
+graph TD
     subgraph "Presentation Layer"
         A[InvoiceCaptureScreen]
-        B[CameraService]
+        B[CameraService] 
         C[ModelStatusService]
     end
     
@@ -56,16 +56,15 @@ graph TB
     end
     
     A --> D
-    B --> D
-    C --> E
     D --> E
     D --> F
     F --> G
-    F --> H
-    F --> I
+    G --> H
+    G --> I
     G --> J
-    H -.->|"Gemma 3n<br/>4.4GB E4B"| G
-    I -.->|"Google ML Kit<br/>OCR"| G
+    
+    H -.->|"Gemma 3n<br/>4.4GB E4B"| H
+    I -.->|"Google ML Kit<br/>OCR"| I
     
     classDef presentation fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
     classDef domain fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
