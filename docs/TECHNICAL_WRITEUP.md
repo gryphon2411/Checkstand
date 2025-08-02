@@ -346,14 +346,19 @@ fun `parseReceiptFromResponse extracts correct data`() {
 
 ---
 
-## Future Enhancements
+## Current Features & Future Enhancements
 
-### Technical Roadmap
+### Implemented Features
+1. ✅ **Batch Processing**: Queue-based multiple receipt analysis with retry logic
+2. ✅ **Export Capabilities**: CSV data export with proper formatting and sharing
+3. ✅ **Advanced Analytics**: Local spending tracking with totals and receipt counts
+4. ✅ **Background Processing**: Asynchronous receipt processing with status indicators
+
+### Future Technical Roadmap
 1. **Multi-language Support**: OCR and LLM processing for international receipts
-2. **Batch Processing**: Queue-based multiple receipt analysis
-3. **Voice Interface**: Accessibility features for visually impaired users
-4. **Export Capabilities**: PDF reports and CSV data export
-5. **Advanced Analytics**: Local spending pattern analysis
+2. **Voice Interface**: Accessibility features for visually impaired users
+3. **PDF Reports**: Formatted receipt summaries for business use
+4. **Cloud Sync (Optional)**: Privacy-preserving backup with end-to-end encryption
 
 ### Scalability Considerations
 - Modular architecture supports feature expansion
