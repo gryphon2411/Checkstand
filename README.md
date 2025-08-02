@@ -216,7 +216,7 @@ This app demonstrates:
 
 ## License
 
-CC BY 4.0 License - see LICENSE file for details
+CC BY 4.0 License - see [LICENSE](https://github.com/gryphon2411/Checkstand/blob/master/LICENSE)
 
 ## Acknowledgments
 
