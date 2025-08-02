@@ -1,114 +1,62 @@
 # Checkstand Video Demo Script
 **Google Gemma 3n Impact Challenge Submission**
-*Target Duration: 3-4 minutes*
+*Duration: 2:25*
 
 ---
 
-## **SCENE 1: The Financial Black Hole** *(0:00 - 0:30)*
+## **THE FINANCIAL BLACK HOLE** *(0:00 - 0:48)*
 
-### **Opening Hook** *(0:00 - 0:15)*
-**[Show pile of crumpled receipts on desk next to a smartphone showing a banking app. The banking app shows transactions like "SuperMart $78.50" but no item details.]**
+### **Opening Hook** *(0:00 - 0:17)*
+**[Show bank statement on phone with cryptic merchant names]**
 
-**NARRATOR**: "We try to track our spending, but our bank app only tells us *where* we spent money, not *what* we bought. These receipts... they're a financial black hole. How can you control your budget if you don't know where your money is really going?"
+**NARRATOR**: "The financial black hole. Picture this. You're staring at your bank statement, confused. QSRLLC $23.50. What the hell is QSRLLC? You rack your brain. Sounds like a government agency, but it was actually Tony's burger joint."
 
-### **The Core Problem** *(0:15 - 0:30)*
-**[Quick cuts: coffee shop receipt, grocery store receipt, hardware store receipt.]**
+### **The Modern Problem** *(0:18 - 0:48)*
+**[Show ATM withdrawal, then empty wallet, confused person]**
 
-**NARRATOR**: "Our most frequent purchases from supermarkets, cafes, and local shops are often invisible in our digital records. This is where we lose control."
-
----
-
-## **SCENE 2: The Solution - Private Financial Empowerment** *(0:30 - 1:15)*
-
-### **Meet Checkstand** *(0:30 - 0:45)*
-**[Show Checkstand app loading on phone]**
-
-**NARRATOR**: "Meet Checkstand. It's a powerful, simple tool designed to solve this exact problem. It turns your physical receipts into actionable financial data, right on your phone."
-
-### **The Trust Foundation: On-Device AI** *(0:45 - 1:00)*
-**[Show animation: A receipt is scanned, and a 'lock' icon stays on the phone. Data doesn't go to a cloud.]**
-
-**NARRATOR**: "But to trust an app with your financial life, you need absolute privacy. That's why we built Checkstand with Google's on-device Gemma 3n model. All the AI processing happens here, on your phone. Nothing is ever uploaded, shared, or seen by anyone else."
-
-### **The "Bigger Than Chatbot" Moment** *(1:00 - 1:15)*
-**[Show Google Gemma 3n logo transition to Checkstand interface]**
-
-**NARRATOR**: "The challenge asked us to think bigger than a chatbot. Checkstand answers that call by delivering true financial empowerment, made possible *because* of its private, on-device AI."
-
-### **Development Journey Insight** *(1:15 - 1:30)*
-**[Show quick montage: React Native logo → Error screen → Android logo]**
-
-**NARRATOR**: "We actually started building this in React Native, but hit a real constraint - the Metro bundler couldn't handle our 4.4GB AI model. Rather than compromise, we pivoted to native Android, proving our commitment to the best possible solution."
+**NARRATOR**: "This is insane. We live in 2025, yet our financial lives are trapped in cryptic code names that make zero sense. But cash payments, that's even worse. You pull out $200 from the ATM and a week later it's gone. Where did it go? The grocery store, gas station, that lunch with friends? There's literally no digital record anywhere. At least credit card transactions give you cryptic clues. Cash purchases vanish into thin air. You're flying completely blind with zero accountability."
 
 ---
 
-## **SCENE 3: Live Demonstration** *(1:30 - 2:45)*
+## **THE BRUTAL TRUTH** *(0:48 - 1:31)*
 
-### **Demo Setup** *(1:30 - 1:40)*
-**[Show real receipts and phone ready]**
+### **The Scale of the Problem** *(0:48 - 1:15)*
+**[Show statistics, receipts being thrown away]**
 
-**NARRATOR**: "Let me show you how it works. I have real receipts here, and I'm going to scan them live - no editing, no tricks."
+**NARRATOR**: "Every day, millions of Americans play this guessing game with their own money. The average person makes 257 credit card transactions per year plus countless cash purchases. Each time you get a receipt with the real store name, the actual date, the exact amount. And what do we do with this precious financial data? We stuff it in our pockets and throw it away. We're literally discarding the keys to understanding our spending one receipt at a time."
 
-### **First Receipt Scan** *(1:25 - 1:55)*
-**[Live camera capture of receipt, show processing]**
+### **The Disconnect** *(1:15 - 1:31)*
+**[Show banking app vs. real receipts]**
 
-**NARRATOR**: "I'll open Checkstand, point the camera at this receipt, and capture. Watch the status indicator - 'Gemma 3n' shows our AI model is ready. Now I'll take the photo..."
-
-**[Show processing indicator: "Processing receipt..."]**
-
-**NARRATOR**: "Behind the scenes, three things happen instantly: First, optical character recognition extracts the text. Then, Google's Gemma 3n model - running entirely on this device - analyzes that text. Finally, smart parsing extracts the merchant, date, and total amount."
-
-### **Results Reveal** *(1:55 - 2:10)*
-**[Show parsed receipt data]**
-
-**NARRATOR**: "And there we have it! Target, July 15th, $24.00 - perfectly extracted in about 24 seconds. All processing happened on this device, with zero internet connection required."
-
-### **Second Receipt for Reliability** *(2:10 - 2:30)*
-**[Quick second demo]**
-
-**NARRATOR**: "Let me try another one to show consistency... Perfect! Another receipt processed accurately. This isn't a tech demo - it's a production-ready application."
+**NARRATOR**: "Here's the brutal truth. Your banking app is lying to you with cryptic merchant names, and cash purchases don't even exist in your digital world. Meanwhile, every receipt in your trash can has the real story. This disconnect is costing people thousands in untracked spending every year."
 
 ---
 
-## **SCENE 4: Technical Innovation** *(2:30 - 3:00)*
+## **THE SOLUTION** *(1:31 - 2:07)*
 
-### **Under the Hood** *(2:30 - 2:50)*
-**[Show architecture diagram or code snippets]**
+### **Meet Checkstand** *(1:31 - 1:42)*
+**[Show Checkstand app logo and interface]**
 
-**NARRATOR**: "What makes this possible? Checkstand implements a sophisticated multimodal AI pipeline. We use Google's MediaPipe framework to run the 4.4GB Gemma 3n model locally, combined with ML Kit for OCR, all wrapped in a Clean Architecture with robust error handling and smart fallbacks."
+**NARRATOR**: "But what if I told you this madness ends today? Meet Checkstand, the app that finally bridges the gap between your confusing statements and reality, whether you paid by card or cash."
 
-### **Privacy Focus** *(2:50 - 3:00)*
-**[Show "offline" indicator, airplane mode demo]**
+### **Live Demo** *(1:42 - 2:07)*
+**[Show actual receipt scanning in real-time]**
 
-**NARRATOR**: "The privacy implications are profound. Your financial data never leaves your device. It works in airplane mode, in remote areas, in countries with strict data laws - anywhere you need it."
-
----
-
-## **SCENE 5: Real-World Impact** *(3:00 - 3:30)*
-
-### **Use Cases** *(3:00 - 3:20)*
-**[Show different user scenarios: small business, personal finance, accessibility]**
-
-**NARRATOR**: "Who benefits? Small business owners tracking expenses for taxes. Individuals managing personal budgets. People in crisis situations processing insurance claims without internet. Those concerned about financial privacy. Visually impaired users who can leverage voice feedback."
-
-### **The Bigger Picture** *(3:20 - 3:30)*
-**[Show global connectivity challenges]**
-
-**NARRATOR**: "In a world where 3 billion people lack reliable internet access, on-device AI isn't just convenient - it's democratizing technology."
+**NARRATOR**: "Watch this magic happen live. I'm scanning this Amazon receipt right now. Doesn't matter if I paid with my credit card or a $20 bill. Google's Gemma 3n AI processes it entirely on my device. No internet, no cloud, no data leaving my phone. Three seconds later, Amazon, November 29th, $54.99. The real name, the actual transaction, perfectly captured."
 
 ---
 
-## **SCENE 6: Call to Action** *(3:30 - 4:00)*
+## **THE TRANSFORMATION** *(2:07 - 2:25)*
 
-### **Competition Context** *(3:30 - 3:45)*
-**[Show Google Gemma 3n Challenge logo]**
+### **Beyond Organization** *(2:07 - 2:17)*
+**[Show clear spending data, understanding patterns]**
 
-**NARRATOR**: "This is our submission for the Google Gemma 3n Impact Challenge, specifically targeting the Google AI Edge Prize for showcasing compelling on-device AI applications."
+**NARRATOR**: "This isn't just about organizing receipts. This is about reclaiming your complete financial truth. Imagine never again wondering where that cash disappeared to. Imagine actually knowing your spending patterns because you finally have accurate data from every single purchase."
 
-### **Future Vision** *(3:45 - 4:00)*
-**[Show code repository, download links]**
+### **The New Era** *(2:17 - 2:25)*
+**[Show confident person with clear financial picture]**
 
-**NARRATOR**: "The complete source code is available under CC BY 4.0 license. Try Checkstand yourself - because your financial privacy shouldn't be the price of convenience. This is AI that works for you, not against you."
+**NARRATOR**: "The age of financial confusion is over. The age of spending clarity begins now."
 
 **[End with Checkstand logo and "Privacy-First AI"]**
 
