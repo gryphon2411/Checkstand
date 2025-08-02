@@ -35,7 +35,6 @@
 - ✅ **Fully functional** receipt processing with Gemma 3n integration
 - ✅ **Clean Architecture** implementation with professional UI/UX
 - ✅ **Privacy-first design** - all processing happens on-device
-- ✅ **Performance optimized** - ~3 second processing time
 - ✅ **Device tested** - verified working on physical Android hardware
 
 ### **🎬 Video Demonstration**
@@ -63,7 +62,6 @@
 - **AI Model**: Google Gemma 3n running entirely on-device
 - **Architecture**: Clean Architecture with clear separation of concerns
 - **Privacy**: Zero data leaves the device - complete financial privacy
-- **Performance**: Optimized for mobile with ~3 second processing
 - **UI/UX**: Material Design with professional polish and app icon
 - **Compatibility**: Android with MediaPipe AI integration
 
