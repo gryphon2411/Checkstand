@@ -41,9 +41,7 @@ In today's economy, tracking expenses is crucial. Yet, our most frequent purchas
 
 ## 🎬 **See It In Action**
 
-> **Status**: Production-ready application with polished Material Design UI
-
-[🎥 **Demo Video**](#) *(Video production in progress - scheduled for July 29, 2025)*
+[🎥 **Demo Video**](https://www.youtube.com/watch?v=Pb0Qe0wS8Pk)
 
 ### ✨ **Latest Updates**
 - **Material Design Icons**: Professional vector drawables replace emoji icons
