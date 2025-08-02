@@ -34,30 +34,46 @@ Checkstand delivers **financial empowerment through trustworthy, on-device AI** 
 
 ### 2.1 Clean Architecture Implementation
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      Presentation Layer                         │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
-│  │ InvoiceCapture  │ │  CameraService  │ │ ModelStatusSvc  │   │
-│  │    Screen       │ │                 │ │                 │   │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-                               │
-┌─────────────────────────────────────────────────────────────────┐
-│                       Domain Layer                              │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
-│  │ProcessReceiptUse│ │     Receipt     │ │  Repositories   │   │
-│  │      Case       │ │     Model       │ │  (Interfaces)   │   │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-                               │
-┌─────────────────────────────────────────────────────────────────┐
-│                        Data Layer                               │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
-│  │MediaPipeLLMRepo │ │   LLMService    │ │   OCRService    │   │
-│  │                 │ │                 │ │                 │   │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph "Presentation Layer"
+        A[InvoiceCaptureScreen]
+        B[CameraService]
+        C[ModelStatusService]
+    end
+    
+    subgraph "Domain Layer"
+        D[ProcessReceiptUseCase]
+        E[Receipt Model]
+        F[Repository Interfaces]
+    end
+    
+    subgraph "Data Layer"
+        G[MediaPipeLLMRepo]
+        H[LLMService]
+        I[OCRService]
+        J[Local Database]
+    end
+    
+    A --> D
+    B --> D
+    C --> E
+    D --> E
+    D --> F
+    F --> G
+    F --> H
+    F --> I
+    G --> J
+    H -.->|"Gemma 3n<br/>4.4GB E4B"| G
+    I -.->|"Google ML Kit<br/>OCR"| G
+    
+    classDef presentation fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef domain fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef data fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    
+    class A,B,C presentation
+    class D,E,F domain
+    class G,H,I,J data
 ```
 
 ### 2.2 Key Technical Innovations
