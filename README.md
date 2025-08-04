@@ -9,7 +9,7 @@
 
 ## 🎯 The Problem: Financial Data Black Holes
 
-In today's economy, tracking expenses is crucial. Yet, our most frequent purchases—from supermarkets, cafes, and local shops—often end up as paper receipts, creating a black hole in our financial data. How can people take control of their spending if they can't easily track it?
+In today's economy, tracking expenses is crucial. Yet, our most frequent purchases—from supermarkets, cafes, and local shops—often end up as paper receipts, creating a black hole in our financial data. With **~60% of Americans lacking a formal budget** and **18% of all payments still made in cash**, a huge volume of financial data is lost. How can people control their spending if they can't track it?
 
 **Checkstand's Answer:** Empower users with a tool that digitizes physical receipts, providing crucial financial insights that were previously lost.
 
@@ -77,19 +77,14 @@ cd Checkstand
 4. **Smart Parsing**: Robust extraction with intelligent fallbacks
 5. **Local Storage**: All data stays on device in local database
 
-## 📊 **Real-World Impact**
+## 📊 **Quantified Impact & Market Size**
 
-### **Target Users**
-- **Small Business Owners**: Expense tracking for tax purposes
-- **Personal Finance**: Budget management and spending analysis  
-- **Accessibility**: Voice-guided receipt processing for visually impaired
-- **Crisis Response**: Offline expense tracking for insurance claims
+Checkstand addresses a massive, underserved market by providing a private, educational tool for financial empowerment.
 
-### **Privacy Advantages**
-- **No Cloud Dependencies**: Works in airplane mode
-- **GDPR Compliant**: No personal data collection or transmission
-- **Corporate Security**: Suitable for sensitive business receipts
-- **Remote Areas**: Functions without reliable internet connectivity
+- **Budget-Conscious Households (~79M in U.S.)**: A simple, effective tool for the 60% of U.S. households that do not have a formal budget.
+- **Freelancers & Gig Workers (~64M in U.S.)**: Meticulous, offline-first expense tracking for the 38% of the workforce that needs it for tax purposes and managing variable income.
+- **The Cash-Reliant Population (~36M in U.S.)**: Serves the ~14% of U.S. adults who use cash for most purchases and are excluded from mainstream digital finance apps.
+- **Privacy-Aware Users**: In a market where **~79% of consumers are concerned about data privacy**, Checkstand's on-device AI is a critical differentiator that builds essential trust.
 
 ## 🏆 **Competition Alignment**
 
