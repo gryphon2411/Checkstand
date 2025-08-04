@@ -79,7 +79,7 @@ cd Checkstand
 
 ## 📊 **Quantified Impact & Market Size**
 
-Checkstand addresses a massive, underserved market by providing a private, educational tool for financial empowerment.
+Checkstand addresses a massive, underserved market by providing a private, educational tool for financial empowerment. ([View Data Sources](https://github.com/gryphon2411/Checkstand/blob/master/docs/MARKET_RESEARCH.md))
 
 - **Budget-Conscious Households (~79M in U.S.)**: A simple, effective tool for the 60% of U.S. households that do not have a formal budget.
 - **Freelancers & Gig Workers (~64M in U.S.)**: Meticulous, offline-first expense tracking for the 38% of the workforce that needs it for tax purposes and managing variable income.
