@@ -147,23 +147,20 @@ app/src/main/java/com/checkstand/
    - Open the project in Android Studio
    - Wait for Gradle sync to complete
 
-3. **Push the Model to Device**
+3. **Deploy the Model**
    
-   **Important**: You need to push your `gemma-3n-E4B-it-int4.task` file to the device first:
+   A helper script is provided to deploy the model to your connected device.
+   
+   **Important**: Place your `gemma-3n-E4B-it-int4.task` file in the project's root directory before running the script.
    
    ```bash
-   # Connect your device and enable USB debugging
-   adb devices
+   # Make the script executable (if needed)
+   chmod +x deploy-model.sh
    
-   # Create the directory on device
-   adb shell mkdir -p /data/local/tmp/llm/
-   
-   # Push your model file to the device
-   adb push /path/to/your/gemma-3n-E4B-it-int4.task /data/local/tmp/llm/gemma-3n-E4B-it-int4.task
-   
-   # Verify the file was pushed correctly
-   adb shell ls -la /data/local/tmp/llm/
+   # Run the deployment script
+   ./deploy-model.sh
    ```
+   The script will verify your `adb` connection, find the model file, and push it to the correct location on your device.
 
 4. **Build and Run**
    - Build the project
