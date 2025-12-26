@@ -15,3 +15,7 @@
 local.properties
 # Large model files
 *.task
+
+# Web
+web/dist/
+web/node_modules/
