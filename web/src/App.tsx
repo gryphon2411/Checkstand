@@ -260,10 +260,7 @@ const ReceiptDemo = () => {
                         {/* Recent List */}
                         <div className="bg-slate-800/30">
                             {/* Item 1: The Scanned Receipt (Highlighted) */}
-                            <motion.div
-                                initial={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
-                                animate={{ backgroundColor: "transparent" }}
-                                transition={{ duration: 2, delay: 1.5 }}
+                            <div
                                 className="px-6 py-4 flex items-center justify-between border-b border-slate-700/50"
                             >
                                 <span className="text-sm text-slate-400 w-12 font-medium">11/29</span>
@@ -274,7 +271,8 @@ const ReceiptDemo = () => {
                                         <Check className="w-3 h-3 text-blue-400" />
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
+
 
                             {/* Item 2: Historical */}
                             <div className="px-6 py-4 flex items-center justify-between opacity-50">
