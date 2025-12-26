@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
-import { Github, CheckCircle2, Zap, Scan, Hexagon, EyeOff, FileCode } from 'lucide-react';
+import { Github, CheckCircle2, Zap, Scan, Hexagon, EyeOff, FileCode, Book, Smartphone, Fingerprint, Receipt } from 'lucide-react';
 import QRCode from "react-qr-code";
 
 // --- Constants ---
 const DOWNLOAD_URL = "https://github.com/gryphon2411/Checkstand/releases/download/v1.2.0/checkstand-v1.2.0-release.apk";
 const REPO_URL = "https://github.com/gryphon2411/Checkstand/releases/tag/v1.2.0";
+const KAGGLE_URL = "https://www.kaggle.com/code/gryphon2411/checkstand-gemini-3n-impact-challenge";
+
 // --- Custom Hooks ---
 
 const useIsMobile = () => {
@@ -30,7 +32,7 @@ const Navbar = () => (
             <img
                 src="/Checkstand/logo.png"
                 alt="Checkstand"
-                className="w-8 h-8 md:w-10 md:h-10 shadow-lg transform rotate-3 rounded-xl"
+                className="w-10 h-10 md:w-12 md:h-12 shadow-lg rounded-xl object-contain bg-white"
             />
             <span className="font-bold text-lg md:text-xl text-slate-900 dark:text-white tracking-tight">Checkstand</span>
         </div>
@@ -47,6 +49,84 @@ const Navbar = () => (
         </a>
     </nav>
 );
+
+// --- "How It Works" Section ---
+
+const HowItWorks = () => {
+    const steps = [
+        {
+            title: "Snap Receipt",
+            desc: "Open the app and take a quick photo of any crumpled, blurry receipt.",
+            icon: <Smartphone className="w-6 h-6 text-white" />,
+            color: "bg-blue-500",
+            image: "/Checkstand/step1_scan.jpg"
+        },
+        {
+            title: "AI De-masking",
+            desc: "Gemma 3n runs locally to identify the merchant (e.g., 'Target') and total.",
+            icon: <Fingerprint className="w-6 h-6 text-white" />,
+            color: "bg-sparkle-yellow",
+            image: "/Checkstand/step2_verify.jpg"
+        },
+        {
+            title: "Export Data",
+            desc: "Get a clean JSON or CSV for your budget. No cloud syncing required.",
+            icon: <Receipt className="w-6 h-6 text-white" />,
+            color: "bg-green-500",
+            image: "/Checkstand/step3_csv.jpg"
+        }
+    ];
+
+    return (
+        <div className="mt-24 md:mt-32">
+            <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">How it Works</h2>
+                <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+                    Three steps to financial clarity. Zero data leaving your device.
+                </p>
+            </div>
+
+            <div className="space-y-12 md:space-y-24">
+                {steps.map((step, index) => (
+                    <div key={index} className={`flex flex-col md:flex-row gap-8 md:gap-16 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+
+                        {/* Text (Always First on Mobile via Default Flex Col) */}
+                        <div className="flex-1 text-center md:text-left space-y-4">
+                            <div className={`w-12 h-12 ${step.color} rounded-2xl flex items-center justify-center shadow-lg mx-auto md:mx-0 transform -rotate-3`}>
+                                {step.icon}
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                                <span className="text-electric-blue mr-2">{index + 1}.</span>
+                                {step.title}
+                            </h3>
+                            <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed">
+                                {step.desc}
+                            </p>
+                        </div>
+
+                        {/* Image / Phone Frame */}
+                        <div className="flex-1 w-full max-w-xs md:max-w-sm mx-auto">
+                            <div className="relative aspect-[9/18] bg-white border-[8px] border-slate-900 rounded-[3rem] shadow-2xl overflow-hidden">
+                                {/* Notch */}
+                                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-20"></div>
+
+                                {/* Screen Content */}
+                                <div className="absolute inset-0 bg-slate-50 z-10 flex flex-col">
+                                    <img
+                                        src={step.image}
+                                        alt={step.title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
 
 // --- The "Wow" Demo ---
 
@@ -232,7 +312,7 @@ function App() {
             <main className="container mx-auto px-6 max-w-6xl">
                 <Navbar />
 
-                <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center pt-4 md:pt-16 pb-32">
+                <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center pt-4 md:pt-16 pb-12">
                     {/* Left: Copy & Actions */}
                     <div className="space-y-8 text-center md:text-left z-10">
                         <motion.div
@@ -274,20 +354,35 @@ function App() {
                     </div>
                 </div>
 
+                <HowItWorks />
                 <TrustSection />
 
-                <footer className="pt-12 pb-44 md:pb-12 text-center text-slate-400 text-sm">
-                    <p>&copy; {new Date().getFullYear()} Checkstand. All rights reserved.</p>
-                    <a
-                        href={REPO_URL}
-                        className="inline-flex items-center justify-center gap-2 mt-4 hover:text-electric-blue transition-colors"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <Github className="w-4 h-4" />
-                        <span>View on GitHub</span>
-                    </a>
+                <footer className="pt-24 pb-44 md:pb-12 text-center text-slate-400 text-sm">
+                    <p className="mb-4">&copy; {new Date().getFullYear()} Checkstand. All rights reserved.</p>
+
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                        <a
+                            href={KAGGLE_URL}
+                            className="inline-flex items-center gap-2 hover:text-electric-blue transition-colors font-medium text-slate-500 bg-white dark:bg-slate-800 px-4 py-2 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <Book className="w-4 h-4" />
+                            Read Engineering Case Study (Kaggle)
+                        </a>
+
+                        <a
+                            href={REPO_URL}
+                            className="inline-flex items-center gap-2 hover:text-electric-blue transition-colors text-slate-500"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <Github className="w-4 h-4" />
+                            View on GitHub
+                        </a>
+                    </div>
                 </footer>
+
             </main>
 
             {/* MOBILE ONLY: Sticky Bottom Bar */}
@@ -300,7 +395,7 @@ function App() {
                 </a>
             </div>
         </div>
-    )
+    );
 }
 
-export default App
+export default App;
