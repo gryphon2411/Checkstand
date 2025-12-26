@@ -276,7 +276,7 @@ function App() {
 
                 <TrustSection />
 
-                <footer className="pt-12 pb-32 md:pb-12 text-center text-slate-400 text-sm">
+                <footer className="pt-12 pb-44 md:pb-12 text-center text-slate-400 text-sm">
                     <p>&copy; {new Date().getFullYear()} Checkstand. All rights reserved.</p>
                     <a
                         href={REPO_URL}
