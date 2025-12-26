@@ -5,8 +5,8 @@ import QRCode from "react-qr-code";
 
 // --- Constants ---
 const DOWNLOAD_URL = "https://github.com/gryphon2411/Checkstand/releases/download/v1.2.0/checkstand-v1.2.0-release.apk";
-const REPO_URL = "https://github.com/gryphon2411/Checkstand/releases/tag/v1.2.0";
-const KAGGLE_URL = "https://www.kaggle.com/code/gryphon2411/checkstand-gemini-3n-impact-challenge";
+const REPO_URL = "https://github.com/gryphon2411/Checkstand";
+const KAGGLE_URL = "https://www.kaggle.com/competitions/google-gemma-3n-hackathon/writeups/checkstand-ai-powered-financial-empowerment-throug";
 
 // --- Custom Hooks ---
 
