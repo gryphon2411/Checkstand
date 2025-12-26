@@ -145,10 +145,10 @@ const ReceiptDemo = () => {
             // Start the loop immediately
             setMobileActive(true);
 
-            // Cycle: Show for 3s, Hide for 1.5s
+            // Cycle: Show for 4s (1.2s scan + 2.8s read), Hide for 1.5s
             interval = setInterval(() => {
                 setMobileActive(prev => !prev);
-            }, mobileActive ? 3000 : 1500);
+            }, mobileActive ? 4000 : 1500);
         } else {
             setMobileActive(false);
         }
@@ -170,56 +170,81 @@ const ReceiptDemo = () => {
             {/* Background Gradients */}
             <div className={`absolute inset-0 bg-blue-500/5 blur-3xl rounded-full transform translate-y-10 transition-colors duration-700 ${isActive ? 'bg-sparkle-yellow/20' : ''}`}></div>
 
-            {/* State A: Crumpled Paper (Simulated via CSS) */}
-            {!isActive && (
-                <motion.div
-                    layoutId="receipt-container"
-                    className="absolute inset-0 flex items-center justify-center"
-                    initial={{ rotate: -2, scale: 0.95, opacity: 1 }}
-                    animate={{ rotate: -2, scale: 0.95, opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                >
-                    <div className="w-72 h-96 bg-slate-100 border border-slate-300 shadow-sm p-6 flex flex-col gap-4 overflow-hidden rounded-sm filter brightness-95">
-                        <div className="h-8 bg-slate-200 w-1/3 mx-auto rounded"></div>
-                        <div className="h-4 bg-slate-200 w-full rounded mt-8"></div>
-                        <div className="h-4 bg-slate-200 w-3/4 rounded"></div>
-                        <div className="h-4 bg-slate-200 w-5/6 rounded"></div>
-                        <div className="h-px bg-slate-300 w-full my-4 border-dashed border-t border-slate-400"></div>
-                        <div className="h-6 bg-slate-200 w-1/2 ml-auto rounded"></div>
+            {/* State A: Crumpled Paper (Always Rendered as Base) */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center"
+                initial={{ rotate: -2, scale: 0.95, opacity: 1 }}
+                animate={{
+                    rotate: isActive ? 0 : -2,
+                    scale: 0.95,
+                    opacity: 1 // Keep opacity 1 so it's visible during scan
+                }}
+            >
+                <div className="relative w-72 h-96 bg-slate-100 border border-slate-300 shadow-sm p-6 flex flex-col gap-4 overflow-hidden rounded-sm filter brightness-95">
+                    <div className="h-8 bg-slate-200 w-1/3 mx-auto rounded"></div>
+                    <div className="h-4 bg-slate-200 w-full rounded mt-8"></div>
+                    <div className="h-4 bg-slate-200 w-3/4 rounded"></div>
+                    <div className="h-4 bg-slate-200 w-5/6 rounded"></div>
+                    <div className="h-px bg-slate-300 w-full my-4 border-dashed border-t border-slate-400"></div>
+                    <div className="h-6 bg-slate-200 w-1/2 ml-auto rounded"></div>
 
-                        {/* Crumple effect overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent pointer-events-none"></div>
+                    {/* Crumple effect overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent pointer-events-none"></div>
+
+                    {/* ACTIVE STATE: Blur Overlay + Camera Icon + Laser */}
+                    <AnimatePresence>
+                        {isActive && (
+                            <>
+                                {/* Blur + Icon */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px] z-10 flex items-center justify-center"
+                                >
+                                    <div className="bg-white/20 p-4 rounded-full backdrop-blur-md border border-white/30">
+                                        <Scan className="w-8 h-8 text-slate-800 dark:text-white opacity-80" />
+                                    </div>
+                                </motion.div>
+
+                                {/* Scanning Laser Beam */}
+                                <motion.div
+                                    initial={{ top: -20, opacity: 1 }}
+                                    animate={{ top: "120%" }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 1.2, ease: "linear" }}
+                                    className="absolute left-0 right-0 h-1 bg-electric-blue shadow-[0_0_15px_rgba(41,121,255,0.8)] z-20"
+                                />
+                            </>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Hint Badge (Hidden on Mobile) */}
+                {!isMobile && !isActive && (
+                    <div className="absolute -bottom-6 bg-white dark:bg-slate-800 shadow-xl px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 animate-bounce">
+                        <Scan className="w-4 h-4 text-electric-blue" />
+                        Hover to Scan
                     </div>
+                )}
+            </motion.div>
 
-                    {/* Hint Badge (Hidden on Mobile) */}
-                    {!isMobile && (
-                        <div className="absolute -bottom-6 bg-white dark:bg-slate-800 shadow-xl px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 animate-bounce">
-                            <Scan className="w-4 h-4 text-electric-blue" />
-                            {isInView ? "Scanning..." : "Hover to Scan"}
-                        </div>
-                    )}
-                </motion.div>
-            )}
 
-            {/* State B: Verified 3D Card */}
+            {/* State B: Verified 3D Card (Enters AFTER Scan) */}
             <AnimatePresence>
                 {isActive && (
                     <motion.div
-                        layoutId="receipt-container"
-                        className="z-10 w-80 bg-white dark:bg-slate-800 rounded-3xl shadow-card p-6 overflow-hidden relative border border-slate-100 dark:border-slate-700"
-                        initial={{ rotate: 0, scale: 0.95, opacity: 0, y: 10 }}
+                        className="z-30 w-80 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-6 overflow-hidden relative border border-slate-100 dark:border-slate-700"
+                        initial={{ rotate: 0, scale: 0.9, opacity: 0, y: 30 }}
                         animate={{ rotate: 0, scale: 1, opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                        exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                        transition={{
+                            delay: 1.1, // Wait for laser (1.2s approx)
+                            type: "spring",
+                            stiffness: 260,
+                            damping: 20
+                        }}
                     >
-                        {/* Scanning Beam Animation */}
-                        <motion.div
-                            initial={{ top: -20 }}
-                            animate={{ top: "200%" }}
-                            transition={{ duration: 1.5, ease: "easeInOut" }}
-                            className="absolute left-0 right-0 h-2 bg-sparkle-yellow/50 shadow-[0_0_20px_rgba(255,193,7,0.6)] z-20 blur-sm"
-                        />
-
                         {/* Header */}
                         <div className="flex justify-between items-start mb-6">
                             <div className="flex gap-3 items-center">
