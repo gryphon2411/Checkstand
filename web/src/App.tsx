@@ -1,71 +1,39 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
-import { Shield, ChevronDown, ChevronUp, Github, CheckCircle2, Zap, Scan, Hexagon } from 'lucide-react';
+import { Github, CheckCircle2, Zap, Scan, Hexagon, EyeOff, FileCode } from 'lucide-react';
+import QRCode from "react-qr-code";
+
+// --- Constants ---
+const DOWNLOAD_URL = "https://github.com/gryphon2411/Checkstand/releases/download/v1.2.0/checkstand-v1.2.0-release.apk";
+const REPO_URL = "https://github.com/gryphon2411/Checkstand/releases/tag/v1.2.0";
 
 // --- Custom Hooks ---
 
-const useOS = () => {
-    const [os, setOS] = useState<'ios' | 'android' | 'desktop'>('desktop');
-
-    useEffect(() => {
-        const userAgent = navigator.userAgent.toLowerCase();
-        if (/iphone|ipad|ipod/.test(userAgent)) {
-            setOS('ios');
-        } else if (/android/.test(userAgent)) {
-            setOS('android');
-        } else {
-            setOS('desktop');
-        }
-    }, []);
-
-    return os;
-};
-
-const useCampaign = () => {
-    const [headline, setHeadline] = useState("Stop Guessing Where Your Cash Went.");
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('utm_campaign') === 'privacy') {
-            setHeadline("The Only Financial App That Doesn't Spy on You.");
-        }
-    }, []);
-
-    return headline;
-};
 
 // --- Helper Components ---
 
-const CTAButton = ({ text, className = "", onClick }: { text: string, className?: string, onClick?: () => void }) => (
-    <button
-        onClick={onClick}
-        data-testid="hero-cta"
-        className={`bg-electric-blue text-white font-bold text-lg md:text-xl px-10 h-16 flex items-center justify-center rounded-3xl shadow-soft hover:shadow-electric-blue/40 hover:-translate-y-1 transition-all active:scale-95 ${className}`}
-    >
-        {text}
-    </button>
-);
-
 const Navbar = () => (
-    <nav className="flex justify-between items-center py-6 px-4 md:px-0 mb-12">
+    <nav className="flex justify-between items-center py-6 px-4 md:px-0 mb-8 md:mb-12">
         {/* Logo Area */}
         <div className="flex items-center gap-3">
             <img
                 src="/Checkstand/logo.png"
                 alt="Checkstand"
-                className="w-10 h-10 shadow-lg transform rotate-3 rounded-xl"
+                className="w-8 h-8 md:w-10 md:h-10 shadow-lg transform rotate-3 rounded-xl"
             />
-            <span className="font-bold text-xl text-slate-900 dark:text-white tracking-tight">Checkstand</span>
+            <span className="font-bold text-lg md:text-xl text-slate-900 dark:text-white tracking-tight">Checkstand</span>
         </div>
 
-        {/* AI Active Status */}
-        <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-2xl">
-            <div className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sparkle-yellow opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-sparkle-yellow"></span>
-            </div>
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-300">AI Active</span>
-        </div>
+        {/* Trust Signal */}
+        <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 text-slate-500 hover:text-electric-blue transition-colors font-medium text-sm bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full"
+        >
+            <Github className="w-4 h-4" />
+            <span className="hidden md:inline">Source Code</span>
+        </a>
     </nav>
 );
 
@@ -82,7 +50,7 @@ const ReceiptDemo = () => {
     return (
         <div
             ref={containerRef}
-            className="relative w-full max-w-sm mx-auto cursor-pointer group h-[500px] flex items-center justify-center"
+            className="relative w-full max-w-sm mx-auto cursor-pointer group h-[450px] flex items-center justify-center"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => setIsHovered(!isHovered)}
@@ -172,7 +140,7 @@ const ReceiptDemo = () => {
 
                         {/* Footer Info */}
                         <div className="flex justify-between items-center text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                            <span>Processed on Device</span>
+                            <span>Processed on Device (3s)</span>
                             <span className="flex items-center gap-1">
                                 <motion.div
                                     animate={{ scale: [1, 1.2, 1] }}
@@ -190,152 +158,79 @@ const ReceiptDemo = () => {
     );
 }
 
-const TechSpecs = () => {
-    const [isOpen, setIsOpen] = useState(false);
+// --- Trust Section ---
 
-    return (
-        <div className="max-w-2xl mx-auto mt-16">
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-md transition-shadow flex justify-between items-center group border border-slate-100 dark:border-slate-700"
-            >
-                <div className="flex items-center gap-3">
-                    <div className="bg-slate-100 dark:bg-slate-700 p-2 rounded-full group-hover:bg-electric-blue/10 transition-colors">
-                        <Zap className="w-5 h-5 text-slate-500 group-hover:text-electric-blue transition-colors" />
-                    </div>
-                    <span className="font-bold text-slate-700 dark:text-slate-200">Technical Specs</span>
-                </div>
-                {isOpen ? <ChevronUp className="text-slate-400" /> : <ChevronDown className="text-slate-400" />}
-            </button>
-
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden bg-slate-50 dark:bg-slate-900/50 mx-4 rounded-b-3xl"
-                    >
-                        <div className="p-6 pt-2 space-y-4 text-sm text-slate-600 dark:text-slate-300">
-                            <div className="flex items-center gap-3">
-                                <div className="w-1.5 h-1.5 rounded-full bg-electric-blue"></div>
-                                <span><strong>Algorithm:</strong> Google Gemma 3n (4-bit quantized)</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-1.5 h-1.5 rounded-full bg-electric-blue"></div>
-                                <span><strong>Context:</strong> 128k tokens for item extraction</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-1.5 h-1.5 rounded-full bg-electric-blue"></div>
-                                <span><strong>Privacy:</strong> Local MediaPipe Inference Pipeline</span>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+const TrustSection = () => (
+    <div className="grid md:grid-cols-3 gap-6 mt-16 md:mt-24">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
+            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
+                <EyeOff className="w-5 h-5 text-electric-blue" />
+            </div>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-2">Zero Cloud</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Your data never leaves your phone. 100% offline processing.</p>
         </div>
-    )
-}
 
-const CookieToast = () => {
-    const [visible, setVisible] = useState(true);
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
+            <div className="w-10 h-10 bg-yellow-50 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mb-4">
+                <Zap className="w-5 h-5 text-sparkle-yellow" />
+            </div>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-2">AI De-Masking</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Turns cryptic "QSR LLC" into clear "Taco Bell" automatically.</p>
+        </div>
 
-    useEffect(() => {
-        const timer = setTimeout(() => setVisible(false), 5000);
-        return () => clearTimeout(timer);
-    }, []);
-
-    return (
-        <AnimatePresence>
-            {visible && (
-                <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 50, opacity: 0 }}
-                    className="fixed bottom-6 left-6 z-50 bg-slate-900 text-white pl-4 pr-6 py-3 rounded-full shadow-2xl flex items-center gap-3 max-w-sm"
-                >
-                    <Shield className="w-4 h-4 text-electric-blue fill-electric-blue" />
-                    <p className="text-xs font-bold">No cookies. No tracking. Pure privacy.</p>
-                </motion.div>
-            )}
-        </AnimatePresence>
-    );
-}
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
+            <div className="w-10 h-10 bg-green-50 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
+                <FileCode className="w-5 h-5 text-green-600" />
+            </div>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-2">Open Source</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Auditable code. No hidden trackers. Verified by community.</p>
+        </div>
+    </div>
+);
 
 // --- Main App ---
 
 function App() {
-    const os = useOS();
-    const headline = useCampaign();
-
-    const getDesktopButtonText = () => {
-        switch (os) {
-            case 'ios': return "Join TestFlight Beta";
-            case 'android': return "Download Signed APK";
-            default: return "Scan QR to Install";
-        }
-    };
-
-    const desktopCtaText = getDesktopButtonText();
-
-    // Mobile Sticky Logic: Always simplified "Download" unless unrelated OS
-    const mobileCtaText = os === 'ios' ? "Join TestFlight" : "Download App";
-
-    const handleCTAClick = () => {
-        if (os === 'desktop') {
-            alert("QR Code Modal Placeholder");
-        } else {
-            console.log("Navigating to download...");
-        }
-    };
-
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50 font-sans selection:bg-sparkle-yellow selection:text-black">
 
             <main className="container mx-auto px-6 max-w-6xl">
                 <Navbar />
 
-                <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center pt-8 md:pt-16 pb-32">
-                    {/* Left: Copy */}
-                    <div className="space-y-8 text-center md:text-left z-10">
+                <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center pt-4 md:pt-16 pb-32">
+                    {/* Left: Copy & Actions */}
+                    <div className="space-y-8 text-center md:text-left z-10 order-last md:order-first">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
                         >
-                            <div className="inline-flex items-center gap-2 bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-4 py-1.5 rounded-full text-xs font-bold border border-yellow-200 dark:border-yellow-700/50 mb-2">
-                                <span>🏆 Winner: Google Gemma 3n Impact Challenge</span>
-                            </div>
-                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] text-slate-900 dark:text-white">
-                                {headline.includes("Spy") ?
-                                    <span>The Only <span className="text-electric-blue">Privacy App</span> That Doesn't Spy.</span> :
-                                    <span>Stop Guessing Where Your <span className="text-electric-blue">Cash Went.</span></span>
-                                }
+                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] text-slate-900 dark:text-white mb-6">
+                                Stop Guessing Where Your <span className="text-electric-blue">Cash Went.</span>
                             </h1>
+                            <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-lg mx-auto md:mx-0 leading-relaxed font-medium">
+                                The offline AI scanner that de-masks your bank statement. Powered by Gemma 3n. <span className="text-slate-900 dark:text-white">Private by design.</span>
+                            </p>
                         </motion.div>
 
-                        <motion.p
-                            className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-lg mx-auto md:mx-0 leading-relaxed"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.6 }}
-                        >
-                            Turn paper chaos into financial truth in 3 seconds. Powered by Gemma 3n. <span className="font-bold text-slate-900 dark:text-white">100% Offline.</span>
-                        </motion.p>
-
-                        {/* Desktop CTA */}
-                        <motion.div
-                            className="hidden md:flex flex-col gap-4 items-start"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                        >
-                            <CTAButton text={desktopCtaText} onClick={handleCTAClick} />
-                            <div className="flex items-center gap-4 text-xs font-medium text-slate-400 pl-2">
-                                <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Open Source Code</span>
-                                <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> No Credit Card</span>
+                        {/* DESKTOP ONLY: QR Code Card */}
+                        <div className="hidden md:flex bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 w-fit">
+                            <div className="bg-white p-2 rounded-xl">
+                                <QRCode value={DOWNLOAD_URL} size={120} />
                             </div>
-                        </motion.div>
+                            <div className="ml-6 flex flex-col justify-center text-left">
+                                <span className="font-bold text-lg text-slate-900 dark:text-white">Scan to Install</span>
+                                <span className="text-sm text-slate-500 mb-3 block">Android (APK)</span>
+                                <div className="text-[10px] uppercase tracking-wider font-bold text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded w-fit">
+                                    Version 1.2.0 • Open Source
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Disclaimer for Beta */}
+                        <p className="text-xs text-slate-400 italic md:text-left mx-auto md:mx-0 max-w-xs md:max-w-none">
+                            Note: As a Beta, you may need to 'Allow from this source' to install.
+                        </p>
                     </div>
 
                     {/* Right: Demo */}
@@ -344,27 +239,31 @@ function App() {
                     </div>
                 </div>
 
-                <TechSpecs />
+                <TrustSection />
 
-                <footer className="py-12 text-center">
+                <footer className="py-12 text-center text-slate-400 text-sm">
+                    <p>&copy; {new Date().getFullYear()} Checkstand. All rights reserved.</p>
                     <a
-                        href="https://github.com/gryphon2411/Checkstand"
-                        className="inline-flex items-center justify-center gap-2 text-slate-400 hover:text-electric-blue transition-colors font-medium text-sm"
+                        href={REPO_URL}
+                        className="inline-flex items-center justify-center gap-2 mt-4 hover:text-electric-blue transition-colors"
                         target="_blank"
                         rel="noreferrer"
                     >
                         <Github className="w-4 h-4" />
-                        <span>Audit our Code on GitHub</span>
+                        <span>View on GitHub</span>
                     </a>
                 </footer>
             </main>
 
-            {/* Mobile Sticky CTA */}
-            <div className="md:hidden fixed bottom-6 left-4 right-4 z-50 pb-safe">
-                <CTAButton text={mobileCtaText} onClick={handleCTAClick} className="w-full shadow-2xl" />
+            {/* MOBILE ONLY: Sticky Bottom Bar */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.1)]">
+                <a
+                    href={DOWNLOAD_URL}
+                    className="w-full bg-electric-blue text-white font-bold text-xl h-[72px] flex items-center justify-center rounded-2xl shadow-lg active:scale-95 transition-transform"
+                >
+                    Download App (v1.2.0)
+                </a>
             </div>
-
-            <CookieToast />
         </div>
     )
 }

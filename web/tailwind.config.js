@@ -7,7 +7,7 @@ export default {
     theme: {
         extend: {
             colors: {
-                'electric-blue': '#2979FF',
+                'electric-blue': '#4285F4',
                 'sparkle-yellow': '#FFC107',
             },
             boxShadow: {
