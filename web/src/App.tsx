@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Shield, ChevronDown, ChevronUp, Github, CheckCircle2, Zap, Scan, Hexagon } from 'lucide-react';
 
 // --- Custom Hooks ---
@@ -50,9 +50,11 @@ const Navbar = () => (
     <nav className="flex justify-between items-center py-6 px-4 md:px-0 mb-12">
         {/* Logo Area */}
         <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-electric-blue rounded-xl flex items-center justify-center shadow-lg transform rotate-3">
-                <span className="text-white font-bold text-xl">C</span>
-            </div>
+            <img
+                src="/Checkstand/logo.png"
+                alt="Checkstand"
+                className="w-10 h-10 shadow-lg transform rotate-3 rounded-xl"
+            />
             <span className="font-bold text-xl text-slate-900 dark:text-white tracking-tight">Checkstand</span>
         </div>
 
@@ -71,19 +73,25 @@ const Navbar = () => (
 
 const ReceiptDemo = () => {
     const [isHovered, setIsHovered] = useState(false);
+    const containerRef = useRef(null);
+    const isInView = useInView(containerRef, { amount: 0.6 });
+
+    // Auto-trigger on mobile scroll (if in view), or hover on desktop
+    const isActive = isHovered || isInView;
 
     return (
         <div
+            ref={containerRef}
             className="relative w-full max-w-sm mx-auto cursor-pointer group h-[500px] flex items-center justify-center"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            onClick={() => setIsHovered(!isHovered)} // Tap for mobile
+            onClick={() => setIsHovered(!isHovered)}
         >
             {/* Background Gradients */}
             <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full transform translate-y-10 group-hover:bg-sparkle-yellow/20 transition-colors duration-700"></div>
 
             {/* State A: Crumpled Paper (Simulated via CSS) */}
-            {!isHovered && (
+            {!isActive && (
                 <motion.div
                     layoutId="receipt-container"
                     className="absolute inset-0 flex items-center justify-center"
@@ -106,14 +114,14 @@ const ReceiptDemo = () => {
                     {/* Hint Badge */}
                     <div className="absolute -bottom-6 bg-white dark:bg-slate-800 shadow-xl px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 animate-bounce">
                         <Scan className="w-4 h-4 text-electric-blue" />
-                        Hover to Scan
+                        {isInView ? "Scanning..." : "Hover to Scan"}
                     </div>
                 </motion.div>
             )}
 
             {/* State B: Verified 3D Card */}
             <AnimatePresence>
-                {isHovered && (
+                {isActive && (
                     <motion.div
                         layoutId="receipt-container"
                         className="z-10 w-80 bg-white dark:bg-slate-800 rounded-3xl shadow-card p-6 overflow-hidden relative border border-slate-100 dark:border-slate-700"
@@ -166,7 +174,12 @@ const ReceiptDemo = () => {
                         <div className="flex justify-between items-center text-[10px] text-slate-400 font-medium uppercase tracking-wider">
                             <span>Processed on Device</span>
                             <span className="flex items-center gap-1">
-                                <Zap className="w-3 h-3 text-sparkle-yellow fill-sparkle-yellow" />
+                                <motion.div
+                                    animate={{ scale: [1, 1.2, 1] }}
+                                    transition={{ repeat: Infinity, duration: 2 }}
+                                >
+                                    <Zap className="w-3 h-3 text-sparkle-yellow fill-sparkle-yellow" />
+                                </motion.div>
                                 Gemma 3n
                             </span>
                         </div>
@@ -255,7 +268,7 @@ function App() {
     const os = useOS();
     const headline = useCampaign();
 
-    const getButtonText = () => {
+    const getDesktopButtonText = () => {
         switch (os) {
             case 'ios': return "Join TestFlight Beta";
             case 'android': return "Download Signed APK";
@@ -263,7 +276,10 @@ function App() {
         }
     };
 
-    const ctaText = getButtonText();
+    const desktopCtaText = getDesktopButtonText();
+
+    // Mobile Sticky Logic: Always simplified "Download" unless unrelated OS
+    const mobileCtaText = os === 'ios' ? "Join TestFlight" : "Download App";
 
     const handleCTAClick = () => {
         if (os === 'desktop') {
@@ -314,7 +330,7 @@ function App() {
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.4 }}
                         >
-                            <CTAButton text={ctaText} onClick={handleCTAClick} />
+                            <CTAButton text={desktopCtaText} onClick={handleCTAClick} />
                             <div className="flex items-center gap-4 text-xs font-medium text-slate-400 pl-2">
                                 <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Open Source Code</span>
                                 <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> No Credit Card</span>
@@ -345,7 +361,7 @@ function App() {
 
             {/* Mobile Sticky CTA */}
             <div className="md:hidden fixed bottom-6 left-4 right-4 z-50 pb-safe">
-                <CTAButton text={ctaText} onClick={handleCTAClick} className="w-full shadow-2xl" />
+                <CTAButton text={mobileCtaText} onClick={handleCTAClick} className="w-full shadow-2xl" />
             </div>
 
             <CookieToast />
