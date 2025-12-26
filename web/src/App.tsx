@@ -107,8 +107,7 @@ const HowItWorks = () => {
                         {/* Image / Phone Frame */}
                         <div className="flex-1 w-full max-w-xs md:max-w-sm mx-auto">
                             <div className="relative aspect-[9/18] bg-white border-[8px] border-slate-900 rounded-[3rem] shadow-2xl overflow-hidden">
-                                {/* Notch */}
-                                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-20"></div>
+
 
                                 {/* Screen Content */}
                                 <div className="absolute inset-0 bg-slate-50 z-10 flex flex-col">
