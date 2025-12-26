@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Github, CheckCircle2, Zap, Scan, Hexagon, EyeOff, FileCode } from 'lucide-react';
 import QRCode from "react-qr-code";
@@ -6,9 +6,20 @@ import QRCode from "react-qr-code";
 // --- Constants ---
 const DOWNLOAD_URL = "https://github.com/gryphon2411/Checkstand/releases/download/v1.2.0/checkstand-v1.2.0-release.apk";
 const REPO_URL = "https://github.com/gryphon2411/Checkstand/releases/tag/v1.2.0";
-
 // --- Custom Hooks ---
 
+const useIsMobile = () => {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
+    return isMobile;
+};
 
 // --- Helper Components ---
 
@@ -41,22 +52,44 @@ const Navbar = () => (
 
 const ReceiptDemo = () => {
     const [isHovered, setIsHovered] = useState(false);
+    const [mobileActive, setMobileActive] = useState(false);
     const containerRef = useRef(null);
     const isInView = useInView(containerRef, { amount: 0.6 });
+    const isMobile = useIsMobile();
 
-    // Auto-trigger on mobile scroll (if in view), or hover on desktop
-    const isActive = isHovered || isInView;
+    // Loop logic for mobile
+    useEffect(() => {
+        if (!isMobile) return;
+
+        let interval: any;
+        if (isInView) {
+            // Start the loop immediately
+            setMobileActive(true);
+
+            // Cycle: Show for 3s, Hide for 1.5s
+            interval = setInterval(() => {
+                setMobileActive(prev => !prev);
+            }, mobileActive ? 3000 : 1500);
+        } else {
+            setMobileActive(false);
+        }
+
+        return () => clearInterval(interval);
+    }, [isMobile, isInView, mobileActive]);
+
+    // Active state decision
+    const isActive = isMobile ? mobileActive : (isHovered || isInView);
 
     return (
         <div
             ref={containerRef}
             className="relative w-full max-w-sm mx-auto cursor-pointer group h-[450px] flex items-center justify-center"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onClick={() => setIsHovered(!isHovered)}
+            onMouseEnter={() => !isMobile && setIsHovered(true)}
+            onMouseLeave={() => !isMobile && setIsHovered(false)}
+            onClick={() => !isMobile && setIsHovered(!isHovered)}
         >
             {/* Background Gradients */}
-            <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full transform translate-y-10 group-hover:bg-sparkle-yellow/20 transition-colors duration-700"></div>
+            <div className={`absolute inset-0 bg-blue-500/5 blur-3xl rounded-full transform translate-y-10 transition-colors duration-700 ${isActive ? 'bg-sparkle-yellow/20' : ''}`}></div>
 
             {/* State A: Crumpled Paper (Simulated via CSS) */}
             {!isActive && (
@@ -79,11 +112,13 @@ const ReceiptDemo = () => {
                         <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent pointer-events-none"></div>
                     </div>
 
-                    {/* Hint Badge */}
-                    <div className="absolute -bottom-6 bg-white dark:bg-slate-800 shadow-xl px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 animate-bounce">
-                        <Scan className="w-4 h-4 text-electric-blue" />
-                        {isInView ? "Scanning..." : "Hover to Scan"}
-                    </div>
+                    {/* Hint Badge (Hidden on Mobile) */}
+                    {!isMobile && (
+                        <div className="absolute -bottom-6 bg-white dark:bg-slate-800 shadow-xl px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 animate-bounce">
+                            <Scan className="w-4 h-4 text-electric-blue" />
+                            {isInView ? "Scanning..." : "Hover to Scan"}
+                        </div>
+                    )}
                 </motion.div>
             )}
 
@@ -199,7 +234,7 @@ function App() {
 
                 <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center pt-4 md:pt-16 pb-32">
                     {/* Left: Copy & Actions */}
-                    <div className="space-y-8 text-center md:text-left z-10 order-last md:order-first">
+                    <div className="space-y-8 text-center md:text-left z-10">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -234,7 +269,7 @@ function App() {
                     </div>
 
                     {/* Right: Demo */}
-                    <div className="order-first md:order-last">
+                    <div>
                         <ReceiptDemo />
                     </div>
                 </div>
@@ -256,7 +291,7 @@ function App() {
             </main>
 
             {/* MOBILE ONLY: Sticky Bottom Bar */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.1)]">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.1)]">
                 <a
                     href={DOWNLOAD_URL}
                     className="w-full bg-electric-blue text-white font-bold text-xl h-[72px] flex items-center justify-center rounded-2xl shadow-lg active:scale-95 transition-transform"
