@@ -130,42 +130,25 @@ const HowItWorks = () => {
 // --- The "Wow" Demo ---
 
 const ReceiptDemo = () => {
-    const [isHovered, setIsHovered] = useState(false);
-    const [mobileActive, setMobileActive] = useState(false);
+    const [isActive, setIsActive] = useState(false);
     const containerRef = useRef(null);
-    const isInView = useInView(containerRef, { amount: 0.6 });
+    const isInView = useInView(containerRef, { amount: 0.4 });
     const isMobile = useIsMobile();
 
-    // Loop logic for mobile
+    // Reset when scrolled out of view
     useEffect(() => {
-        if (!isMobile) return;
-
-        let interval: any;
-        if (isInView) {
-            // Start the loop immediately
-            setMobileActive(true);
-
-            // Cycle: Show for 4s (1.2s scan + 2.8s read), Hide for 1.5s
-            interval = setInterval(() => {
-                setMobileActive(prev => !prev);
-            }, mobileActive ? 4000 : 1500);
-        } else {
-            setMobileActive(false);
+        if (!isInView) {
+            setIsActive(false);
         }
-
-        return () => clearInterval(interval);
-    }, [isMobile, isInView, mobileActive]);
-
-    // Active state decision
-    const isActive = isMobile ? mobileActive : (isHovered || isInView);
+    }, [isInView]);
 
     return (
         <div
             ref={containerRef}
             className="relative w-full max-w-sm mx-auto cursor-pointer group h-[450px] flex items-center justify-center"
-            onMouseEnter={() => !isMobile && setIsHovered(true)}
-            onMouseLeave={() => !isMobile && setIsHovered(false)}
-            onClick={() => !isMobile && setIsHovered(!isHovered)}
+            onMouseEnter={() => !isMobile && setIsActive(true)}
+            onMouseLeave={() => !isMobile && setIsActive(false)}
+            onClick={() => setIsActive(!isActive)}
         >
             {/* Background Gradients */}
             <div className={`absolute inset-0 bg-blue-500/5 blur-3xl rounded-full transform translate-y-10 transition-colors duration-700 ${isActive ? 'bg-sparkle-yellow/20' : ''}`}></div>
@@ -177,7 +160,7 @@ const ReceiptDemo = () => {
                 animate={{
                     rotate: isActive ? 0 : -2,
                     scale: 0.95,
-                    opacity: 1 // Keep opacity 1 so it's visible during scan
+                    opacity: 1
                 }}
             >
                 <div className="relative w-72 h-96 bg-slate-100 border border-slate-300 shadow-sm p-6 flex flex-col gap-4 overflow-hidden rounded-sm filter brightness-95">
@@ -220,11 +203,11 @@ const ReceiptDemo = () => {
                     </AnimatePresence>
                 </div>
 
-                {/* Hint Badge (Hidden on Mobile) */}
-                {!isMobile && !isActive && (
+                {/* Hint Badge (Always visible when inactive) */}
+                {!isActive && (
                     <div className="absolute -bottom-6 bg-white dark:bg-slate-800 shadow-xl px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 animate-bounce">
                         <Scan className="w-4 h-4 text-electric-blue" />
-                        Hover to Scan
+                        {isMobile ? "Tap to Scan" : "Hover to Scan"}
                     </div>
                 )}
             </motion.div>
