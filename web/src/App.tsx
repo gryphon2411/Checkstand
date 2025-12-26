@@ -106,7 +106,7 @@ const HowItWorks = () => {
 
                         {/* Image / Phone Frame */}
                         <div className="flex-1 w-full max-w-xs md:max-w-sm mx-auto">
-                            <div className="relative aspect-[9/18] bg-white border-[8px] border-slate-900 rounded-[3rem] shadow-2xl overflow-hidden">
+                            <div className="relative aspect-[9/18] bg-white border-[8px] border-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden">
 
 
                                 {/* Screen Content */}
@@ -114,7 +114,7 @@ const HowItWorks = () => {
                                     <img
                                         src={step.image}
                                         alt={step.title}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover object-top"
                                     />
                                 </div>
                             </div>
