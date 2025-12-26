@@ -7,6 +7,8 @@
 [![MediaPipe](https://img.shields.io/badge/AI-MediaPipe-green)](https://mediapipe.dev/)
 [![Privacy First](https://img.shields.io/badge/Trust-Uncompromising%20Privacy-red)](https://github.com)
 
+**[🌐 Visit Live Landing Page](https://gryphon2411.github.io/Checkstand/)** | **[📝 Kaggle Case Study](https://www.kaggle.com/competitions/google-gemma-3n-hackathon/writeups/checkstand-ai-powered-financial-empowerment-throug)**
+
 ## 🎯 The Problem: Financial Data Black Holes
 
 In today's economy, tracking expenses is crucial. Yet, our most frequent purchases—from supermarkets, cafes, and local shops—often end up as paper receipts, creating a black hole in our financial data. With **~60% of Americans lacking a formal budget** and **18% of all payments still made in cash**, a huge volume of financial data is lost. How can people control their spending if they can't track it?
