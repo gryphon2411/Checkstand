@@ -110,21 +110,11 @@ const HowItWorks = () => {
 
 
                                 {/* Screen Content */}
-                                <div className="absolute inset-0 bg-slate-900 z-10 flex flex-col">
-                                    {/* Mock System Status Bar to prevent clipping */}
-                                    <div className="h-8 w-full bg-[#bfd4fb] flex items-center justify-between px-6 z-20">
-                                        <span className="text-[10px] font-bold text-slate-700">9:41</span>
-                                        <div className="flex gap-1.5">
-                                            <div className="w-3 h-3 rounded-full bg-slate-700 opacity-20"></div>
-                                            <div className="w-3 h-3 rounded-full bg-slate-700 opacity-20"></div>
-                                            <div className="w-4 h-3 rounded-[3px] border border-slate-700 opacity-30"></div>
-                                        </div>
-                                    </div>
-
+                                <div className="absolute inset-0 bg-slate-50 z-10 flex flex-col">
                                     <img
                                         src={step.image}
                                         alt={step.title}
-                                        className="w-full flex-1 object-cover object-top"
+                                        className="w-full h-full object-cover object-top"
                                     />
                                 </div>
                             </div>
