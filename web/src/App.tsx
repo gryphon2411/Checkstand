@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
-import { Github, CheckCircle2, Zap, Scan, Hexagon, EyeOff, FileCode, Book, Smartphone, Fingerprint, Receipt } from 'lucide-react';
+import { Github, Zap, Scan, EyeOff, FileCode, Book, Smartphone, Fingerprint, Receipt, Check } from 'lucide-react';
 import QRCode from "react-qr-code";
 
 // --- Constants ---
@@ -217,7 +217,7 @@ const ReceiptDemo = () => {
             <AnimatePresence>
                 {isActive && (
                     <motion.div
-                        className="z-30 w-80 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-6 overflow-hidden relative border border-slate-100 dark:border-slate-700"
+                        className="z-30 w-80 bg-slate-900 rounded-3xl shadow-2xl overflow-hidden relative border border-slate-700 font-sans text-slate-50"
                         initial={{ rotate: 0, scale: 0.9, opacity: 0, y: 30 }}
                         animate={{ rotate: 0, scale: 1, opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
@@ -228,50 +228,65 @@ const ReceiptDemo = () => {
                             damping: 20
                         }}
                     >
-                        {/* Header */}
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="flex gap-3 items-center">
-                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                                    <Hexagon className="w-6 h-6 fill-current" />
+                        {/* Top Bar / Summary */}
+                        <div className="p-6 pb-2">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-bold">Recent Receipts</h3>
+                                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                                    <Receipt className="w-6 h-6" />
                                 </div>
+                            </div>
+
+                            {/* Stats Box */}
+                            <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50 flex justify-between items-center mb-6">
                                 <div>
-                                    <h3 className="font-bold text-slate-900 dark:text-white">Walmart</h3>
-                                    <p className="text-xs text-slate-500 font-medium">Verified Merchant</p>
+                                    <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1 font-semibold">Total Spent</div>
+                                    <div className="text-2xl font-bold text-blue-400">$689.72</div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1 font-semibold">Receipts</div>
+                                    <div className="text-2xl font-bold">2</div>
                                 </div>
                             </div>
-                            <div className="bg-green-100 text-green-700 p-1.5 rounded-full">
-                                <CheckCircle2 className="w-4 h-4" />
-                            </div>
                         </div>
 
-                        {/* List */}
-                        <div className="space-y-4 mb-6">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-slate-600 dark:text-slate-300">Bananas (Organic)</span>
-                                <span className="font-bold">$2.15</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-slate-600 dark:text-slate-300">Coffee (Starbucks)</span>
-                                <span className="font-bold">$5.40</span>
-                            </div>
-                            <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-2xl flex justify-between items-center font-bold">
-                                <span>Total Paid</span>
-                                <span className="text-lg text-slate-900 dark:text-white">$7.55</span>
-                            </div>
+                        {/* List Header */}
+                        <div className="px-6 py-2 bg-slate-800/80 border-y border-slate-700/50 text-[10px] uppercase tracking-wider font-semibold text-slate-400 flex justify-between">
+                            <span className="w-12">Date</span>
+                            <span className="flex-1">Merchant</span>
+                            <span className="w-16 text-right">Amount</span>
                         </div>
 
-                        {/* Footer Info */}
-                        <div className="flex justify-between items-center text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                            <span>Processed on Device (3s)</span>
-                            <span className="flex items-center gap-1">
-                                <motion.div
-                                    animate={{ scale: [1, 1.2, 1] }}
-                                    transition={{ repeat: Infinity, duration: 2 }}
-                                >
-                                    <Zap className="w-3 h-3 text-sparkle-yellow fill-sparkle-yellow" />
-                                </motion.div>
-                                Gemma 3n
-                            </span>
+                        {/* Recent List */}
+                        <div className="bg-slate-800/30">
+                            {/* Item 1: The Scanned Receipt (Highlighted) */}
+                            <motion.div
+                                initial={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                                animate={{ backgroundColor: "transparent" }}
+                                transition={{ duration: 2, delay: 1.5 }}
+                                className="px-6 py-4 flex items-center justify-between border-b border-slate-700/50"
+                            >
+                                <span className="text-sm text-slate-400 w-12 font-medium">11/29</span>
+                                <span className="text-sm font-bold flex-1 truncate mr-2">Amazon.com</span>
+                                <div className="flex items-center gap-2 justify-end">
+                                    <span className="text-sm font-bold text-blue-400">$54.99</span>
+                                    <div className="bg-blue-500/20 p-1 rounded-full">
+                                        <Check className="w-3 h-3 text-blue-400" />
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* Item 2: Historical */}
+                            <div className="px-6 py-4 flex items-center justify-between opacity-50">
+                                <span className="text-sm text-slate-400 w-12 font-medium">08/01</span>
+                                <span className="text-sm font-bold flex-1 truncate mr-2">Craigs Land...</span>
+                                <div className="flex items-center gap-2 justify-end">
+                                    <span className="text-sm font-bold">$634.73</span>
+                                    <div className="bg-blue-500/20 p-1 rounded-full">
+                                        <Check className="w-3 h-3 text-blue-400" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 )}
