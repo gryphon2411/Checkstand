@@ -7,7 +7,7 @@
 [![MediaPipe](https://img.shields.io/badge/AI-MediaPipe-green)](https://mediapipe.dev/)
 [![Privacy First](https://img.shields.io/badge/Trust-Uncompromising%20Privacy-red)](https://github.com)
 
-**[🌐 Visit Live Landing Page](https://gryphon2411.github.io/Checkstand/)** | **[📝 Kaggle Case Study](https://www.kaggle.com/competitions/google-gemma-3n-hackathon/writeups/checkstand-ai-powered-financial-empowerment-throug)**
+🌐 **[Visit Live Landing Page](https://gryphon2411.github.io/Checkstand/)**
 
 ## 🎯 The Problem: Financial Data Black Holes
 
