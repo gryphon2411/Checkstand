@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="app/src/main/ic_launcher-playstore.png" width="160" alt="Checkstand Logo" />
+</p>
+
 # Checkstand - AI-Powered Receipt Scanner
 
 > **Google Gemma 3n Impact Challenge Submission**  
